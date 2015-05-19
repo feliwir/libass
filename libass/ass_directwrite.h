@@ -27,7 +27,7 @@
 #ifdef CONFIG_DIRECTWRITE
 
 ASS_FontProvider *
-ass_coretext_add_provider(ASS_Library *lib, ASS_FontSelector *selector,
+ass_directwrite_add_provider(ASS_Library *lib, ASS_FontSelector *selector,
                           const char *config);
 
 #endif

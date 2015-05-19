@@ -22,7 +22,10 @@
 
 #include <dwrite.h>
 
+extern "C"
+{
 #include "ass_directwrite.h"
+}
 
 static ASS_FontProviderFuncs directwrite_callbacks = {
     NULL,
@@ -33,7 +36,7 @@ static ASS_FontProviderFuncs directwrite_callbacks = {
 };
 
 ASS_FontProvider *
-ass_coretext_add_provider(ASS_Library *lib, ASS_FontSelector *selector,
+ass_directwrite_add_provider(ASS_Library *lib, ASS_FontSelector *selector,
                           const char *config)
 {
 	HRESULT hr = S_OK;
@@ -46,7 +49,7 @@ ass_coretext_add_provider(ASS_Library *lib, ASS_FontSelector *selector,
 
 	if(FAILED(hr))
 	{
-		goto exit:
+		goto exit;
 	}	
 	
 
