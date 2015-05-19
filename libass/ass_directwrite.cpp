@@ -24,4 +24,36 @@
 
 #include "ass_directwrite.h"
 
- #endif
+static ASS_FontProviderFuncs directwrite_callbacks = {
+    NULL,
+    NULL,
+    NULL,
+    NULL,
+    NULL
+};
+
+ASS_FontProvider *
+ass_coretext_add_provider(ASS_Library *lib, ASS_FontSelector *selector,
+                          const char *config)
+{
+	HRESULT hr = S_OK;
+	IDWriteFactory* dwFactory = NULL;
+	ASS_FontProvider *provider = NULL;
+
+	hr = DWriteCreateFactory(DWRITE_FACTORY_TYPE_SHARED,
+            __uuidof(IDWriteFactory),
+            (IUnknown**)(&dwFactory));
+
+	if(FAILED(hr))
+	{
+		goto exit:
+	}	
+	
+
+    provider = ass_font_provider_new(selector, &directwrite_callbacks, dwFactory);
+
+exit: 
+    return provider;
+}
+
+#endif
