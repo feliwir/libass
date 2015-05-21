@@ -28,16 +28,66 @@ extern "C"
 #include "ass_utils.h"
 }
 
-static size_t get_data(void * priv, unsigned char*, size_t, size_t)
+static size_t get_data(void * priv, unsigned char* buf, size_t offset, size_t length)
 {
 	HRESULT hr = S_OK;
 	IDWriteFontFace* face = NULL;
 	IDWriteFont* font = (IDWriteFont*)priv;
+	IDWriteFontFile* files = NULL;
+	IDWriteFontFileStream* stream = NULL;
+	IDWriteFontFileLoader* loader = NULL;
+	UINT32 n_files = 0;
+	UINT64 fileSize;
+	const void* fileBuf = NULL;
+
 	hr = font->CreateFontFace(&face);
+	const void* refKey = NULL;
+	UINT32 keySize = 0;
+	void* fragContext = NULL;
 
 	if (FAILED(hr) || !face)
 		return 0;
 
+	hr = face->GetFiles(&n_files, NULL);
+	if (FAILED(hr))
+		return 0;
+
+	files = (IDWriteFontFile*)malloc(sizeof(IDWriteFontFile)*n_files);
+
+	hr = face->GetFiles(&n_files, &files);
+	if (FAILED(hr) || !files)
+		return 0;
+
+	hr = files[0].GetReferenceKey(&refKey, &keySize);
+	if (FAILED(hr))
+		return 0;
+
+	hr = files[0].GetLoader(&loader);
+	if (FAILED(hr) || !loader)
+		return 0;
+
+	hr = loader->CreateStreamFromKey(refKey,keySize,&stream);
+	if (FAILED(hr) || !stream)
+		return 0;
+
+	if (buf == NULL)
+	{
+		hr = stream->GetFileSize(&fileSize);
+		if (FAILED(hr))
+			return 0;
+
+		free(files);
+		return fileSize;
+	}
+	
+	hr = stream->ReadFileFragment(&fileBuf, offset, length, &fragContext);
+	if (FAILED(hr) || !stream)
+		return 0;
+
+	memcpy(buf, fileBuf, length);
+
+	free(files);
+	return length;
 }
 
 static int check_glyph(void *priv, uint32_t code)
@@ -162,7 +212,7 @@ static void scan_fonts(IDWriteFactory *factory, ASS_FontProvider *provider)
 }
 
 static ASS_FontProviderFuncs directwrite_callbacks = {
-    NULL,
+    get_data,
 	check_glyph,
     NULL,
     destroy,
