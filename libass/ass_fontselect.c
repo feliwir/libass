@@ -237,6 +237,24 @@ ass_font_provider_add_font(ASS_FontProvider *provider,
     ASS_FontSelector *selector = provider->parent;
     ASS_FontInfo *info;
 
+#if 0
+    int j;
+    printf("new font:\n");
+    printf("  families: ");
+    for (j = 0; j < meta->n_family; j++)
+        printf("'%s' ", meta->families[j]);
+    printf("\n");
+    printf("  fullnames: ");
+    for (j = 0; j < meta->n_fullname; j++)
+        printf("'%s' ", meta->fullnames[j]);
+    printf("\n");
+    printf("  slant: %d\n", meta->slant);
+    printf("  weight: %d\n", meta->weight);
+    printf("  width: %d\n", meta->width);
+    printf("  path: %s\n", path);
+    printf("  index: %d\n", index);
+#endif
+
     weight = meta->weight;
     slant  = meta->slant;
     width  = meta->width;
