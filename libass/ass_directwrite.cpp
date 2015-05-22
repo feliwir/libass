@@ -52,8 +52,6 @@ static size_t get_data(void * priv, unsigned char* buf, size_t offset, size_t le
 	if (FAILED(hr))
 		return 0;
 
-	files = (IDWriteFontFile*)malloc(sizeof(IDWriteFontFile)*n_files);
-
 	hr = face->GetFiles(&n_files, &files);
 	if (FAILED(hr) || !files)
 		return 0;
@@ -76,17 +74,17 @@ static size_t get_data(void * priv, unsigned char* buf, size_t offset, size_t le
 		if (FAILED(hr))
 			return 0;
 
-		free(files);
 		return fileSize;
 	}
 	
 	hr = stream->ReadFileFragment(&fileBuf, offset, length, &fragContext);
-	if (FAILED(hr) || !stream)
+	if (FAILED(hr) || !fileBuf)
 		return 0;
 
 	memcpy(buf, fileBuf, length);
 
-	free(files);
+	stream->ReleaseFileFragment(fragContext);
+
 	return length;
 }
 
@@ -175,7 +173,7 @@ static void scan_fonts(IDWriteFactory *factory, ASS_FontProvider *provider)
 				return;
 
 			meta.n_fullname = fontNames->GetCount();
-			meta.fullnames = new char*[meta.n_fullname];
+			meta.fullnames = (char **)calloc(meta.n_fullname, sizeof(char *));
 			for (UINT32 k = 0; k < meta.n_fullname; ++k)
 			{
 				hr = fontNames->GetString(k,localeName, LOCALE_NAME_MAX_LENGTH + 1);
@@ -183,7 +181,7 @@ static void scan_fonts(IDWriteFactory *factory, ASS_FontProvider *provider)
 					return;
 
 				size_needed = WideCharToMultiByte(CP_UTF8, 0, localeName, -1, NULL, 0, NULL, NULL);
-				char* mbName = (char*)ass_aligned_alloc(32,size_needed);
+				char* mbName = (char *)malloc(size_needed);
 				WideCharToMultiByte(CP_UTF8, 0, localeName, -1, mbName, size_needed, NULL, NULL);
 				meta.fullnames[k] = mbName;
 			}
@@ -193,7 +191,7 @@ static void scan_fonts(IDWriteFactory *factory, ASS_FontProvider *provider)
 				return;
 			
 			meta.n_family = familyNames->GetCount();
-			meta.families = new char*[meta.n_family];
+			meta.families = (char **)calloc(meta.n_family, sizeof(char *));
 			for (UINT32 k = 0; k < meta.n_family; ++k)
 			{
 				hr = familyNames->GetString(k, localeName, LOCALE_NAME_MAX_LENGTH + 1);
@@ -201,12 +199,14 @@ static void scan_fonts(IDWriteFactory *factory, ASS_FontProvider *provider)
 					return;
 
 				size_needed = WideCharToMultiByte(CP_UTF8, 0, localeName, -1, NULL, 0, NULL, NULL);
-				char* mbName = (char*)ass_aligned_alloc(32, size_needed);
+				char* mbName = (char *)malloc(size_needed);
 				WideCharToMultiByte(CP_UTF8, 0, localeName, -1, mbName, size_needed, NULL, NULL);
 				meta.families[k] = mbName;
 			}
 
 			ass_font_provider_add_font(provider, &meta, NULL, j, psName, font);
+			free(meta.fullnames);
+			free(meta.families);
 		}   	
     }
 }
