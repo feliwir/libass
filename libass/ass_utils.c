@@ -45,7 +45,7 @@ int has_avx(void)
 {
     uint32_t eax = 1, ebx, ecx, edx;
     ass_get_cpuid(&eax, &ebx, &ecx, &edx);
-    if(!(ecx & (1 << 27))) // not OSXSAVE
+    if (!(ecx & (1 << 27)))     // not OSXSAVE
         return 0;
     uint32_t misc = ecx;
     eax = 0;
@@ -60,7 +60,7 @@ int has_avx2(void)
     return (ebx >> 5) & has_avx();
 }
 
-#endif // ASM
+#endif                          // ASM
 
 #ifndef HAVE_STRNDUP
 char *ass_strndup(const char *s, size_t n)
@@ -78,24 +78,24 @@ char *ass_strndup(const char *s, size_t n)
 
 void *ass_aligned_alloc(size_t alignment, size_t size)
 {
-    assert(!(alignment & (alignment - 1))); // alignment must be power of 2
+    assert(!(alignment & (alignment - 1)));     // alignment must be power of 2
     if (size >= SIZE_MAX - alignment - sizeof(void *))
         return NULL;
     char *allocation = malloc(size + sizeof(void *) + alignment - 1);
     if (!allocation)
         return NULL;
     char *ptr = allocation + sizeof(void *);
-    unsigned int misalign = (uintptr_t)ptr & (alignment - 1);
+    unsigned int misalign = (uintptr_t) ptr & (alignment - 1);
     if (misalign)
         ptr += alignment - misalign;
-    *((void **)ptr - 1) = allocation;
+    *((void **) ptr - 1) = allocation;
     return ptr;
 }
 
 void ass_aligned_free(void *ptr)
 {
     if (ptr)
-        free(*((void **)ptr - 1));
+        free(*((void **) ptr - 1));
 }
 
 /**
@@ -165,7 +165,7 @@ int mystrtoll(char **p, long long *res)
     return *p != start;
 }
 
-int mystrtou32(char **p, int base, uint32_t *res)
+int mystrtou32(char **p, int base, uint32_t * res)
 {
     char *start = *p;
     *res = strtoll(*p, p, base);
@@ -179,7 +179,7 @@ int mystrtod(char **p, double *res)
     return *p != start;
 }
 
-uint32_t string2color(ASS_Library *library, char *p, int hex)
+uint32_t string2color(ASS_Library * library, char *p, int hex)
 {
     uint32_t color = 0;
     int base = hex ? 16 : 10;
@@ -256,7 +256,7 @@ int parse_ycbcr_matrix(char *str)
     return YCBCR_UNKNOWN;
 }
 
-void ass_msg(ASS_Library *priv, int lvl, char *fmt, ...)
+void ass_msg(ASS_Library * priv, int lvl, char *fmt, ...)
 {
     va_list va;
     va_start(va, fmt);
@@ -270,14 +270,16 @@ char *trim_space(char *str)
     int left = 0;
     int right = strlen(str) - 1;
 
-    while (isspace(str[left])) left++;
-    while (right > left && isspace(str[right])) right--;
+    while (isspace(str[left]))
+        left++;
+    while (right > left && isspace(str[right]))
+        right--;
 
     if (left > 0)
         for (i = 0; i <= right - left; i++)
-            str[i] = str[left+i];
+            str[i] = str[left + i];
 
-    str[right-left+1] = '\0';
+    str[right - left + 1] = '\0';
 
     return str;
 }
@@ -325,7 +327,7 @@ unsigned ass_utf8_put_char(char *dest, uint32_t ch)
     char *orig_dest = dest;
 
     if (ch < 0x80) {
-        *dest++ = (char)ch;
+        *dest++ = (char) ch;
     } else if (ch < 0x800) {
         *dest++ = (ch >> 6) | 0xC0;
         *dest++ = (ch & 0x3F) | 0x80;
@@ -352,7 +354,7 @@ unsigned ass_utf8_put_char(char *dest, uint32_t ch)
  * Returns 0 if no styles found => expects at least 1 style.
  * Parsing code always adds "Default" style in the beginning.
  */
-int lookup_style(ASS_Track *track, char *name)
+int lookup_style(ASS_Track * track, char *name)
 {
     int i;
     // '*' seem to mean literally nothing;
@@ -382,7 +384,7 @@ int lookup_style(ASS_Track *track, char *name)
  * \return style in track->styles
  * Returns NULL if no style has the given name.
  */
-ASS_Style *lookup_style_strict(ASS_Track *track, char *name, size_t len)
+ASS_Style *lookup_style_strict(ASS_Track * track, char *name, size_t len)
 {
     int i;
     for (i = track->n_styles - 1; i >= 0; --i) {
@@ -397,7 +399,7 @@ ASS_Style *lookup_style_strict(ASS_Track *track, char *name, size_t len)
 }
 
 #ifdef CONFIG_ENCA
-void *ass_guess_buffer_cp(ASS_Library *library, unsigned char *buffer,
+void *ass_guess_buffer_cp(ASS_Library * library, unsigned char *buffer,
                           int buflen, char *preferred_language,
                           char *fallback)
 {
@@ -434,7 +436,7 @@ void *ass_guess_buffer_cp(ASS_Library *library, unsigned char *buffer,
     if (!detected_sub_cp) {
         detected_sub_cp = strdup(fallback);
         ass_msg(library, MSGL_INFO,
-               "ENCA detection failed: fallback to %s", fallback);
+                "ENCA detection failed: fallback to %s", fallback);
     }
 
     return detected_sub_cp;

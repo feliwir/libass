@@ -27,7 +27,7 @@
 typedef struct ass_synth_priv ASS_SynthPriv;
 
 ASS_SynthPriv *ass_synth_init(double);
-void ass_synth_done(ASS_SynthPriv *priv);
+void ass_synth_done(ASS_SynthPriv * priv);
 
 typedef struct {
     size_t n_contours, max_contours;
@@ -46,13 +46,13 @@ typedef struct {
     unsigned char *buffer;      // h * stride buffer
 } Bitmap;
 
-Bitmap *outline_to_bitmap(ASS_Renderer *render_priv,
-                          ASS_Outline *outline, int bord);
+Bitmap *outline_to_bitmap(ASS_Renderer * render_priv,
+                          ASS_Outline * outline, int bord);
 
 Bitmap *alloc_bitmap(int w, int h);
 
-void ass_synth_blur(ASS_SynthPriv *priv_blur, int opaque_box, int be,
-                    double blur_radius, Bitmap *bm_g, Bitmap *bm_o);
+void ass_synth_blur(ASS_SynthPriv * priv_blur, int opaque_box, int be,
+                    double blur_radius, Bitmap * bm_g, Bitmap * bm_o);
 
 /**
  * \brief perform glyph rendering
@@ -61,29 +61,28 @@ void ass_synth_blur(ASS_SynthPriv *priv_blur, int opaque_box, int be,
  * \param bm_g out: pointer to the bitmap of original glyph is returned here
  * \param bm_o out: pointer to the bitmap of border glyph is returned here
  */
-int outline_to_bitmap2(ASS_Renderer *render_priv,
-                       ASS_Outline *outline, ASS_Outline *border,
-                       Bitmap **bm_g, Bitmap **bm_o);
+int outline_to_bitmap2(ASS_Renderer * render_priv,
+                       ASS_Outline * outline, ASS_Outline * border,
+                       Bitmap ** bm_g, Bitmap ** bm_o);
 
-void ass_free_bitmap(Bitmap *bm);
+void ass_free_bitmap(Bitmap * bm);
 void ass_gauss_blur(unsigned char *buffer, unsigned *tmp2,
                     int width, int height, int stride,
                     unsigned *m2, int r, int mwidth);
-void be_blur_c(uint8_t *buf, intptr_t w,
-               intptr_t h, intptr_t stride,
-               uint16_t *tmp);
-void add_bitmaps_c(uint8_t *dst, intptr_t dst_stride,
-                   uint8_t *src, intptr_t src_stride,
+void be_blur_c(uint8_t * buf, intptr_t w,
+               intptr_t h, intptr_t stride, uint16_t * tmp);
+void add_bitmaps_c(uint8_t * dst, intptr_t dst_stride,
+                   uint8_t * src, intptr_t src_stride,
                    intptr_t height, intptr_t width);
-void sub_bitmaps_c(uint8_t *dst, intptr_t dst_stride,
-                   uint8_t *src, intptr_t src_stride,
+void sub_bitmaps_c(uint8_t * dst, intptr_t dst_stride,
+                   uint8_t * src, intptr_t src_stride,
                    intptr_t height, intptr_t width);
-void mul_bitmaps_c(uint8_t *dst, intptr_t dst_stride,
-                   uint8_t *src1, intptr_t src1_stride,
-                   uint8_t *src2, intptr_t src2_stride,
+void mul_bitmaps_c(uint8_t * dst, intptr_t dst_stride,
+                   uint8_t * src1, intptr_t src1_stride,
+                   uint8_t * src2, intptr_t src2_stride,
                    intptr_t w, intptr_t h);
-void shift_bitmap(Bitmap *bm, int shift_x, int shift_y);
-void fix_outline(Bitmap *bm_g, Bitmap *bm_o);
-Bitmap *copy_bitmap(const Bitmap *src);
+void shift_bitmap(Bitmap * bm, int shift_x, int shift_y);
+void fix_outline(Bitmap * bm_g, Bitmap * bm_o);
+Bitmap *copy_bitmap(const Bitmap * src);
 
 #endif                          /* LIBASS_BITMAP_H */

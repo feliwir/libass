@@ -22,7 +22,7 @@
     { \
         struct structname *a = key1; \
         struct structname *b = key2; \
-        return // conditions follow
+        return                  // conditions follow
 #define GENERIC(type, member) \
             a->member == b->member &&
 #define STRING(member) \
@@ -70,70 +70,47 @@
 // describes an outline bitmap
 START(outline_bitmap, outline_bitmap_hash_key)
     GENERIC(OutlineHashValue *, outline)
-    GENERIC(int, frx) // signed 10.22
-    GENERIC(int, fry) // signed 10.22
-    GENERIC(int, frz) // signed 10.22
-    GENERIC(int, fax) // signed 16.16
-    GENERIC(int, fay) // signed 16.16
+    GENERIC(int, frx)           // signed 10.22
+GENERIC(int, fry)               // signed 10.22
+GENERIC(int, frz)               // signed 10.22
+GENERIC(int, fax)               // signed 16.16
+GENERIC(int, fay)               // signed 16.16
     // shift vector that was added to glyph before applying rotation
     // = 0, if frx = fry = frx = 0
     // = (glyph base point) - (rotation origin), otherwise
-    GENERIC(int, shift_x)
-    GENERIC(int, shift_y)
-    FTVECTOR(advance) // subpixel shift vector
+GENERIC(int, shift_x) GENERIC(int, shift_y) FTVECTOR(advance)   // subpixel shift vector
 END(OutlineBitmapHashKey)
-
 // describe a clip mask bitmap
-START(clip_bitmap, clip_bitmap_hash_key)
-    STRING(text)
-END(ClipMaskHashKey)
-
+START(clip_bitmap, clip_bitmap_hash_key) STRING(text) END(ClipMaskHashKey)
 // describes an outline glyph
-START(glyph, glyph_hash_key)
-    GENERIC(ASS_Font *, font)
-    GENERIC(double, size) // font size
-    GENERIC(int, face_index)
-    GENERIC(int, glyph_index)
-    GENERIC(int, bold)
-    GENERIC(int, italic)
-    GENERIC(unsigned, scale_x) // 16.16
-    GENERIC(unsigned, scale_y) // 16.16
-    FTVECTOR(outline) // border width, 16.16
-    GENERIC(unsigned, flags)    // glyph decoration flags
-    GENERIC(unsigned, border_style)
-    GENERIC(int, hspacing) // 16.16
+START(glyph, glyph_hash_key) GENERIC(ASS_Font *, font) GENERIC(double, size)    // font size
+GENERIC(int, face_index) GENERIC(int, glyph_index) GENERIC(int, bold) GENERIC(int, italic) GENERIC(unsigned, scale_x)   // 16.16
+GENERIC(unsigned, scale_y)      // 16.16
+FTVECTOR(outline)               // border width, 16.16
+GENERIC(unsigned, flags)        // glyph decoration flags
+GENERIC(unsigned, border_style) GENERIC(int, hspacing)  // 16.16
 END(GlyphHashKey)
 
 START(glyph_metrics, glyph_metrics_hash_key)
-    GENERIC(ASS_Font *, font)
-    GENERIC(double, size)
-    GENERIC(int, face_index)
-    GENERIC(int, glyph_index)
-    GENERIC(unsigned, scale_x)
-    GENERIC(unsigned, scale_y)
-END(GlyphMetricsHashKey)
-
+GENERIC(ASS_Font *, font)
+GENERIC(double, size)
+GENERIC(int, face_index)
+GENERIC(int, glyph_index)
+GENERIC(unsigned, scale_x)
+GENERIC(unsigned, scale_y) END(GlyphMetricsHashKey)
 // describes an outline drawing
 START(drawing, drawing_hash_key)
-    GENERIC(unsigned, scale_x)
-    GENERIC(unsigned, scale_y)
-    GENERIC(int, pbo)
-    FTVECTOR(outline)
-    GENERIC(unsigned, border_style)
-    GENERIC(int, hspacing)
-    GENERIC(int, scale)
-    GENERIC(unsigned, hash)
-    STRING(text)
-END(DrawingHashKey)
-
+GENERIC(unsigned, scale_x)
+GENERIC(unsigned, scale_y)
+GENERIC(int, pbo)
+FTVECTOR(outline)
+GENERIC(unsigned, border_style)
+GENERIC(int, hspacing)
+GENERIC(int, scale) GENERIC(unsigned, hash) STRING(text) END(DrawingHashKey)
 // describes post-combining effects
 START(filter, filter_desc)
-    GENERIC(int, flags)
-    GENERIC(int, be)
-    GENERIC(double, blur)
-    FTVECTOR(shadow)
-END(FilterDesc)
-
+GENERIC(int, flags)
+GENERIC(int, be) GENERIC(double, blur) FTVECTOR(shadow) END(FilterDesc)
 #undef START
 #undef GENERIC
 #undef STRING

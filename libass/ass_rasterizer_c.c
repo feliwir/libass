@@ -22,7 +22,7 @@
 
 
 
-void ass_fill_solid_tile16_c(uint8_t *buf, ptrdiff_t stride, int set)
+void ass_fill_solid_tile16_c(uint8_t * buf, ptrdiff_t stride, int set)
 {
     int i, j;
     int8_t value = set ? 255 : 0;
@@ -33,7 +33,7 @@ void ass_fill_solid_tile16_c(uint8_t *buf, ptrdiff_t stride, int set)
     }
 }
 
-void ass_fill_solid_tile32_c(uint8_t *buf, ptrdiff_t stride, int set)
+void ass_fill_solid_tile32_c(uint8_t * buf, ptrdiff_t stride, int set)
 {
     int i, j;
     int8_t value = set ? 255 : 0;
@@ -67,12 +67,14 @@ void ass_fill_solid_tile32_c(uint8_t *buf, ptrdiff_t stride, int set)
  * where clamp(Z) = max(-0.5, min(0.5, Z)).
  */
 
-void ass_fill_halfplane_tile16_c(uint8_t *buf, ptrdiff_t stride,
-                                 int32_t a, int32_t b, int64_t c, int32_t scale)
+void ass_fill_halfplane_tile16_c(uint8_t * buf, ptrdiff_t stride,
+                                 int32_t a, int32_t b, int64_t c,
+                                 int32_t scale)
 {
-    int16_t aa = (a * (int64_t)scale + ((int64_t)1 << 49)) >> 50;
-    int16_t bb = (b * (int64_t)scale + ((int64_t)1 << 49)) >> 50;
-    int16_t cc = ((int32_t)(c >> 11) * (int64_t)scale + ((int64_t)1 << 44)) >> 45;
+    int16_t aa = (a * (int64_t) scale + ((int64_t) 1 << 49)) >> 50;
+    int16_t bb = (b * (int64_t) scale + ((int64_t) 1 << 49)) >> 50;
+    int16_t cc =
+        ((int32_t) (c >> 11) * (int64_t) scale + ((int64_t) 1 << 44)) >> 45;
     cc += (1 << 9) - ((aa + bb) >> 1);
 
     int16_t abs_a = aa < 0 ? -aa : aa;
@@ -100,12 +102,14 @@ void ass_fill_halfplane_tile16_c(uint8_t *buf, ptrdiff_t stride,
     }
 }
 
-void ass_fill_halfplane_tile32_c(uint8_t *buf, ptrdiff_t stride,
-                                 int32_t a, int32_t b, int64_t c, int32_t scale)
+void ass_fill_halfplane_tile32_c(uint8_t * buf, ptrdiff_t stride,
+                                 int32_t a, int32_t b, int64_t c,
+                                 int32_t scale)
 {
-    int16_t aa = (a * (int64_t)scale + ((int64_t)1 << 50)) >> 51;
-    int16_t bb = (b * (int64_t)scale + ((int64_t)1 << 50)) >> 51;
-    int16_t cc = ((int32_t)(c >> 12) * (int64_t)scale + ((int64_t)1 << 44)) >> 45;
+    int16_t aa = (a * (int64_t) scale + ((int64_t) 1 << 50)) >> 51;
+    int16_t bb = (b * (int64_t) scale + ((int64_t) 1 << 50)) >> 51;
+    int16_t cc =
+        ((int32_t) (c >> 12) * (int64_t) scale + ((int64_t) 1 << 44)) >> 45;
     cc += (1 << 8) - ((aa + bb) >> 1);
 
     int16_t abs_a = aa < 0 ? -aa : aa;
@@ -153,17 +157,17 @@ static inline void update_border_line16(int16_t res[16],
     int16_t w = (1 << 10) + (size << 4) - abs_a;
     w = FFMIN(w, 1 << 10) << 3;
 
-    int16_t dc_b = abs_b * (int32_t)size >> 6;
+    int16_t dc_b = abs_b * (int32_t) size >> 6;
     int16_t dc = (FFMIN(abs_a, dc_b) + 2) >> 2;
 
-    int16_t base = (int32_t)b * (int16_t)(up + dn) >> 7;
-    int16_t offs1 = size - ((base + dc) * (int32_t)w >> 16);
-    int16_t offs2 = size - ((base - dc) * (int32_t)w >> 16);
+    int16_t base = (int32_t) b * (int16_t) (up + dn) >> 7;
+    int16_t offs1 = size - ((base + dc) * (int32_t) w >> 16);
+    int16_t offs2 = size - ((base - dc) * (int32_t) w >> 16);
 
     int i;
     size <<= 1;
     for (i = 0; i < 16; ++i) {
-        int16_t cw = (c - va[i]) * (int32_t)w >> 16;
+        int16_t cw = (c - va[i]) * (int32_t) w >> 16;
         int16_t c1 = cw + offs1;
         int16_t c2 = cw + offs2;
         c1 = FFMINMAX(c1, 0, size);
@@ -172,7 +176,7 @@ static inline void update_border_line16(int16_t res[16],
     }
 }
 
-void ass_fill_generic_tile16_c(uint8_t *buf, ptrdiff_t stride,
+void ass_fill_generic_tile16_c(uint8_t * buf, ptrdiff_t stride,
                                const struct segment *line, size_t n_lines,
                                int winding)
 {
@@ -193,7 +197,8 @@ void ass_fill_generic_tile16_c(uint8_t *buf, ptrdiff_t stride,
 
         int16_t up_delta = line->flags & SEGFLAG_DN ? 4 : 0;
         int16_t dn_delta = up_delta;
-        if (!line->x_min && (line->flags & SEGFLAG_EXACT_LEFT))dn_delta ^= 4;
+        if (!line->x_min && (line->flags & SEGFLAG_EXACT_LEFT))
+            dn_delta ^= 4;
         if (line->flags & SEGFLAG_UL_DR) {
             int16_t tmp = up_delta;
             up_delta = dn_delta;
@@ -212,9 +217,13 @@ void ass_fill_generic_tile16_c(uint8_t *buf, ptrdiff_t stride,
         if (line->y_min == line->y_max)
             continue;
 
-        int16_t a = (line->a * (int64_t)line->scale + ((int64_t)1 << 49)) >> 50;
-        int16_t b = (line->b * (int64_t)line->scale + ((int64_t)1 << 49)) >> 50;
-        int16_t c = ((int32_t)(line->c >> 11) * (int64_t)line->scale + ((int64_t)1 << 44)) >> 45;
+        int16_t a =
+            (line->a * (int64_t) line->scale + ((int64_t) 1 << 49)) >> 50;
+        int16_t b =
+            (line->b * (int64_t) line->scale + ((int64_t) 1 << 49)) >> 50;
+        int16_t c =
+            ((int32_t) (line->c >> 11) * (int64_t) line->scale +
+             ((int64_t) 1 << 44)) >> 45;
         c -= (a >> 1) + b * up;
 
         int16_t va[16];
@@ -229,10 +238,12 @@ void ass_fill_generic_tile16_c(uint8_t *buf, ptrdiff_t stride,
 
         if (up_pos) {
             if (dn == up) {
-                update_border_line16(res[up], abs_a, va, b, abs_b, c, up_pos, dn_pos);
+                update_border_line16(res[up], abs_a, va, b, abs_b, c,
+                                     up_pos, dn_pos);
                 continue;
             }
-            update_border_line16(res[up], abs_a, va, b, abs_b, c, up_pos, 64);
+            update_border_line16(res[up], abs_a, va, b, abs_b, c, up_pos,
+                                 64);
             up++;
             c -= b;
         }
@@ -247,7 +258,8 @@ void ass_fill_generic_tile16_c(uint8_t *buf, ptrdiff_t stride,
             c -= b;
         }
         if (dn_pos)
-            update_border_line16(res[dn], abs_a, va, b, abs_b, c, 0, dn_pos);
+            update_border_line16(res[dn], abs_a, va, b, abs_b, c, 0,
+                                 dn_pos);
     }
 
     int16_t cur = 256 * winding;
@@ -272,17 +284,17 @@ static inline void update_border_line32(int16_t res[32],
     int16_t w = (1 << 9) + (size << 3) - abs_a;
     w = FFMIN(w, 1 << 9) << 5;
 
-    int16_t dc_b = abs_b * (int32_t)size >> 6;
+    int16_t dc_b = abs_b * (int32_t) size >> 6;
     int16_t dc = (FFMIN(abs_a, dc_b) + 2) >> 2;
 
-    int16_t base = (int32_t)b * (int16_t)(up + dn) >> 7;
-    int16_t offs1 = size - ((base + dc) * (int32_t)w >> 16);
-    int16_t offs2 = size - ((base - dc) * (int32_t)w >> 16);
+    int16_t base = (int32_t) b * (int16_t) (up + dn) >> 7;
+    int16_t offs1 = size - ((base + dc) * (int32_t) w >> 16);
+    int16_t offs2 = size - ((base - dc) * (int32_t) w >> 16);
 
     int i;
     size <<= 1;
     for (i = 0; i < 32; ++i) {
-        int16_t cw = (c - va[i]) * (int32_t)w >> 16;
+        int16_t cw = (c - va[i]) * (int32_t) w >> 16;
         int16_t c1 = cw + offs1;
         int16_t c2 = cw + offs2;
         c1 = FFMINMAX(c1, 0, size);
@@ -291,7 +303,7 @@ static inline void update_border_line32(int16_t res[32],
     }
 }
 
-void ass_fill_generic_tile32_c(uint8_t *buf, ptrdiff_t stride,
+void ass_fill_generic_tile32_c(uint8_t * buf, ptrdiff_t stride,
                                const struct segment *line, size_t n_lines,
                                int winding)
 {
@@ -312,7 +324,8 @@ void ass_fill_generic_tile32_c(uint8_t *buf, ptrdiff_t stride,
 
         int16_t up_delta = line->flags & SEGFLAG_DN ? 4 : 0;
         int16_t dn_delta = up_delta;
-        if (!line->x_min && (line->flags & SEGFLAG_EXACT_LEFT))dn_delta ^= 4;
+        if (!line->x_min && (line->flags & SEGFLAG_EXACT_LEFT))
+            dn_delta ^= 4;
         if (line->flags & SEGFLAG_UL_DR) {
             int16_t tmp = up_delta;
             up_delta = dn_delta;
@@ -331,9 +344,13 @@ void ass_fill_generic_tile32_c(uint8_t *buf, ptrdiff_t stride,
         if (line->y_min == line->y_max)
             continue;
 
-        int16_t a = (line->a * (int64_t)line->scale + ((int64_t)1 << 50)) >> 51;
-        int16_t b = (line->b * (int64_t)line->scale + ((int64_t)1 << 50)) >> 51;
-        int16_t c = ((int32_t)(line->c >> 12) * (int64_t)line->scale + ((int64_t)1 << 44)) >> 45;
+        int16_t a =
+            (line->a * (int64_t) line->scale + ((int64_t) 1 << 50)) >> 51;
+        int16_t b =
+            (line->b * (int64_t) line->scale + ((int64_t) 1 << 50)) >> 51;
+        int16_t c =
+            ((int32_t) (line->c >> 12) * (int64_t) line->scale +
+             ((int64_t) 1 << 44)) >> 45;
         c -= (a >> 1) + b * up;
 
         int16_t va[32];
@@ -348,10 +365,12 @@ void ass_fill_generic_tile32_c(uint8_t *buf, ptrdiff_t stride,
 
         if (up_pos) {
             if (dn == up) {
-                update_border_line32(res[up], abs_a, va, b, abs_b, c, up_pos, dn_pos);
+                update_border_line32(res[up], abs_a, va, b, abs_b, c,
+                                     up_pos, dn_pos);
                 continue;
             }
-            update_border_line32(res[up], abs_a, va, b, abs_b, c, up_pos, 64);
+            update_border_line32(res[up], abs_a, va, b, abs_b, c, up_pos,
+                                 64);
             up++;
             c -= b;
         }
@@ -366,7 +385,8 @@ void ass_fill_generic_tile32_c(uint8_t *buf, ptrdiff_t stride,
             c -= b;
         }
         if (dn_pos)
-            update_border_line32(res[dn], abs_a, va, b, abs_b, c, 0, dn_pos);
+            update_border_line32(res[dn], abs_a, va, b, abs_b, c, 0,
+                                 dn_pos);
     }
 
     int16_t cur = 256 * winding;

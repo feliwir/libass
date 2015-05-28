@@ -64,32 +64,35 @@ struct ass_font_stream {
     void *priv;
 };
 
-void charmap_magic(ASS_Library *library, FT_Face face);
-ASS_Font *ass_font_new(Cache *font_cache, ASS_Library *library,
-                       FT_Library ftlibrary, ASS_FontSelector *fontsel,
-                       ASS_FontDesc *desc);
-void ass_font_set_transform(ASS_Font *font, double scale_x,
-                            double scale_y, FT_Vector *v);
+void charmap_magic(ASS_Library * library, FT_Face face);
+ASS_Font *ass_font_new(Cache * font_cache, ASS_Library * library,
+                       FT_Library ftlibrary, ASS_FontSelector * fontsel,
+                       ASS_FontDesc * desc);
+void ass_font_set_transform(ASS_Font * font, double scale_x,
+                            double scale_y, FT_Vector * v);
 void ass_face_set_size(FT_Face face, double size);
-void ass_font_set_size(ASS_Font *font, double size);
-void ass_font_get_asc_desc(ASS_Font *font, uint32_t ch, int *asc,
+void ass_font_set_size(ASS_Font * font, double size);
+void ass_font_get_asc_desc(ASS_Font * font, uint32_t ch, int *asc,
                            int *desc);
-int ass_font_get_index(ASS_FontSelector *fontsel, ASS_Font *font,
+int ass_font_get_index(ASS_FontSelector * fontsel, ASS_Font * font,
                        uint32_t symbol, int *face_index, int *glyph_index);
 uint32_t ass_font_index_magic(FT_Face face, uint32_t symbol);
-FT_Glyph ass_font_get_glyph(ASS_Font *font,
+FT_Glyph ass_font_get_glyph(ASS_Font * font,
                             uint32_t ch, int face_index, int index,
                             ASS_Hinting hinting, int deco);
-FT_Vector ass_font_get_kerning(ASS_Font *font, uint32_t c1, uint32_t c2);
-void ass_font_free(ASS_Font *font);
+FT_Vector ass_font_get_kerning(ASS_Font * font, uint32_t c1, uint32_t c2);
+void ass_font_free(ASS_Font * font);
 
-void outline_translate(const ASS_Outline *outline, FT_Pos dx, FT_Pos dy);
-void outline_transform(const ASS_Outline *outline, const FT_Matrix *matrix);
-void outline_get_cbox(const ASS_Outline *outline, FT_BBox *cbox);
-void fix_freetype_stroker(ASS_Outline *outline, int border_x, int border_y);
-int outline_alloc(ASS_Outline *outline, size_t n_contours, size_t n_points);
-ASS_Outline *outline_convert(const FT_Outline *source);
-ASS_Outline *outline_copy(const ASS_Outline *source);
-void outline_free(ASS_Outline *outline);
+void outline_translate(const ASS_Outline * outline, FT_Pos dx, FT_Pos dy);
+void outline_transform(const ASS_Outline * outline,
+                       const FT_Matrix * matrix);
+void outline_get_cbox(const ASS_Outline * outline, FT_BBox * cbox);
+void fix_freetype_stroker(ASS_Outline * outline, int border_x,
+                          int border_y);
+int outline_alloc(ASS_Outline * outline, size_t n_contours,
+                  size_t n_points);
+ASS_Outline *outline_convert(const FT_Outline * source);
+ASS_Outline *outline_copy(const ASS_Outline * source);
+void outline_free(ASS_Outline * outline);
 
 #endif                          /* LIBASS_FONT_H */

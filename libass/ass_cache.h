@@ -29,7 +29,7 @@ typedef struct cache Cache;
 // cache values
 
 typedef struct {
-    Bitmap *bm;               // the actual bitmaps
+    Bitmap *bm;                 // the actual bitmaps
     Bitmap *bm_o;
 } BitmapHashValue;
 
@@ -56,10 +56,10 @@ typedef struct {
 #include "ass_cache_template.h"
 
 // Type-specific function pointers
-typedef unsigned(*HashFunction)(void *key, size_t key_size);
-typedef size_t(*ItemSize)(void *value, size_t value_size);
-typedef unsigned(*HashCompare)(void *a, void *b, size_t key_size);
-typedef void(*CacheItemDestructor)(void *key, void *value);
+typedef unsigned (*HashFunction) (void *key, size_t key_size);
+typedef size_t(*ItemSize) (void *value, size_t value_size);
+typedef unsigned (*HashCompare) (void *a, void *b, size_t key_size);
+typedef void (*CacheItemDestructor) (void *key, void *value);
 
 // cache hash keys
 
@@ -94,7 +94,7 @@ enum {
     FILTER_BORDER_STYLE_3 = 1,
     FILTER_NONZERO_BORDER = 2,
     FILTER_NONZERO_SHADOW = 4,
-    FILTER_DRAW_SHADOW    = 8,  // VSFilter compatibility
+    FILTER_DRAW_SHADOW = 8,     // VSFilter compatibility
 };
 
 typedef struct {
@@ -104,14 +104,15 @@ typedef struct {
 } CompositeHashKey;
 
 Cache *ass_cache_create(HashFunction hash_func, HashCompare compare_func,
-                        CacheItemDestructor destruct_func, ItemSize size_func,
-                        size_t key_size, size_t value_size);
-void *ass_cache_put(Cache *cache, void *key, void *value);
-void *ass_cache_get(Cache *cache, void *key);
-int ass_cache_empty(Cache *cache, size_t max_size);
-void ass_cache_stats(Cache *cache, size_t *size, unsigned *hits,
+                        CacheItemDestructor destruct_func,
+                        ItemSize size_func, size_t key_size,
+                        size_t value_size);
+void *ass_cache_put(Cache * cache, void *key, void *value);
+void *ass_cache_get(Cache * cache, void *key);
+int ass_cache_empty(Cache * cache, size_t max_size);
+void ass_cache_stats(Cache * cache, size_t * size, unsigned *hits,
                      unsigned *misses, unsigned *count);
-void ass_cache_done(Cache *cache);
+void ass_cache_done(Cache * cache);
 Cache *ass_font_cache_create(void);
 Cache *ass_outline_cache_create(void);
 Cache *ass_glyph_metrics_cache_create(void);

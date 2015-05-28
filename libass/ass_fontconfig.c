@@ -35,7 +35,7 @@
 
 static int check_glyph(void *priv, uint32_t code)
 {
-    FcPattern *pat = (FcPattern *)priv;
+    FcPattern *pat = (FcPattern *) priv;
     FcCharSet *charset;
 
     if (!pat)
@@ -54,11 +54,11 @@ static int check_glyph(void *priv, uint32_t code)
 
 static void destroy(void *priv)
 {
-    FcConfig *config = (FcConfig *)priv;
+    FcConfig *config = (FcConfig *) priv;
     FcConfigDestroy(config);
 }
 
-static void scan_fonts(FcConfig *config, ASS_FontProvider *provider)
+static void scan_fonts(FcConfig * config, ASS_FontProvider * provider)
 {
     int i;
     FcFontSet *fonts;
@@ -82,7 +82,7 @@ static void scan_fonts(FcConfig *config, ASS_FontProvider *provider)
             continue;
 
         // simple types
-        result  = FcPatternGetInteger(pat, FC_SLANT, 0, &meta.slant);
+        result = FcPatternGetInteger(pat, FC_SLANT, 0, &meta.slant);
         result |= FcPatternGetInteger(pat, FC_WIDTH, 0, &meta.width);
         result |= FcPatternGetInteger(pat, FC_WEIGHT, 0, &weight);
         result |= FcPatternGetInteger(pat, FC_INDEX, 0, &index);
@@ -100,28 +100,28 @@ static void scan_fonts(FcConfig *config, ASS_FontProvider *provider)
             meta.weight = FONT_WEIGHT_BOLD;
 
         // path
-        result = FcPatternGetString(pat, FC_FILE, 0, (FcChar8 **)&path);
+        result = FcPatternGetString(pat, FC_FILE, 0, (FcChar8 **) & path);
         if (result != FcResultMatch)
             continue;
 
         // read and strdup fullnames
         meta.n_family = 0;
         while (FcPatternGetString(pat, FC_FAMILY, meta.n_family,
-                    (FcChar8 **)&families[meta.n_family]) == FcResultMatch
-                    && meta.n_family < MAX_NAME)
+                                  (FcChar8 **) & families[meta.n_family]) ==
+               FcResultMatch && meta.n_family < MAX_NAME)
             meta.n_family++;
         meta.families = families;
 
         // read and strdup fullnames
         meta.n_fullname = 0;
         while (FcPatternGetString(pat, FC_FULLNAME, meta.n_fullname,
-                    (FcChar8 **)&fullnames[meta.n_fullname]) == FcResultMatch
-                    && meta.n_fullname < MAX_NAME)
+                                  (FcChar8 **) & fullnames[meta.n_fullname])
+               == FcResultMatch && meta.n_fullname < MAX_NAME)
             meta.n_fullname++;
         meta.fullnames = fullnames;
 
         ass_font_provider_add_font(provider, &meta, path, index, NULL,
-                                   (void *)pat);
+                                   (void *) pat);
     }
 }
 
@@ -133,9 +133,9 @@ static ASS_FontProviderFuncs fontconfig_callbacks = {
     NULL,
 };
 
-ASS_FontProvider *
-ass_fontconfig_add_provider(ASS_Library *lib, ASS_FontSelector *selector,
-                            const char *config)
+ASS_FontProvider *ass_fontconfig_add_provider(ASS_Library * lib,
+                                              ASS_FontSelector * selector,
+                                              const char *config)
 {
     int rc;
     FcConfig *fc_config;
@@ -160,15 +160,14 @@ ass_fontconfig_add_provider(ASS_Library *lib, ASS_FontSelector *selector,
         FcConfigDestroy(fc_config);
         goto exit;
     }
-
     // create font provider
     provider = ass_font_provider_new(selector, &fontconfig_callbacks,
-            (void *)fc_config);
+                                     (void *) fc_config);
 
     // scan fonts
     scan_fonts(fc_config, provider);
 
-exit:
+  exit:
     return provider;
 }
 

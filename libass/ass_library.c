@@ -28,7 +28,8 @@
 #include "ass_library.h"
 #include "ass_utils.h"
 
-static void ass_msg_handler(int level, const char *fmt, va_list va, void *data)
+static void ass_msg_handler(int level, const char *fmt, va_list va,
+                            void *data)
 {
     if (level > MSGL_INFO)
         return;
@@ -39,13 +40,13 @@ static void ass_msg_handler(int level, const char *fmt, va_list va, void *data)
 
 ASS_Library *ass_library_init(void)
 {
-    ASS_Library* lib = calloc(1, sizeof(*lib));
+    ASS_Library *lib = calloc(1, sizeof(*lib));
     if (lib)
         lib->msg_callback = ass_msg_handler;
     return lib;
 }
 
-void ass_library_done(ASS_Library *priv)
+void ass_library_done(ASS_Library * priv)
 {
     if (priv) {
         ass_set_fonts_dir(priv, NULL);
@@ -55,19 +56,19 @@ void ass_library_done(ASS_Library *priv)
     }
 }
 
-void ass_set_fonts_dir(ASS_Library *priv, const char *fonts_dir)
+void ass_set_fonts_dir(ASS_Library * priv, const char *fonts_dir)
 {
     free(priv->fonts_dir);
 
     priv->fonts_dir = fonts_dir ? strdup(fonts_dir) : 0;
 }
 
-void ass_set_extract_fonts(ASS_Library *priv, int extract)
+void ass_set_extract_fonts(ASS_Library * priv, int extract)
 {
-    priv->extract_fonts = !!extract;
+    priv->extract_fonts = ! !extract;
 }
 
-void ass_set_style_overrides(ASS_Library *priv, char **list)
+void ass_set_style_overrides(ASS_Library * priv, char **list)
 {
     char **p;
     char **q;
@@ -104,7 +105,7 @@ static int grow_array(void **array, int nelem, size_t elsize)
     return 1;
 }
 
-void ass_add_font(ASS_Library *priv, char *name, char *data, int size)
+void ass_add_font(ASS_Library * priv, char *name, char *data, int size)
 {
     int idx = priv->num_fontdata;
     if (!name || !data || !size)
@@ -126,12 +127,12 @@ void ass_add_font(ASS_Library *priv, char *name, char *data, int size)
     priv->num_fontdata++;
     return;
 
-error:
+  error:
     free(priv->fontdata[idx].name);
     free(priv->fontdata[idx].data);
 }
 
-void ass_clear_fonts(ASS_Library *priv)
+void ass_clear_fonts(ASS_Library * priv)
 {
     int i;
     for (i = 0; i < priv->num_fontdata; ++i) {
@@ -151,8 +152,8 @@ void ass_clear_fonts(ASS_Library *priv)
  * \param msg_cb the callback function
  * \param data additional data that will be passed to the callback
  */
-void ass_set_message_cb(ASS_Library *priv,
-                        void (*msg_cb)(int, const char *, va_list, void *),
+void ass_set_message_cb(ASS_Library * priv,
+                        void (*msg_cb) (int, const char *, va_list, void *),
                         void *data)
 {
     if (msg_cb) {

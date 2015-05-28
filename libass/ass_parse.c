@@ -28,7 +28,7 @@
 
 #define MAX_VALID_NARGS 7
 #define MAX_BE 127
-#define NBSP 0xa0   // unicode non-breaking space character
+#define NBSP 0xa0               // unicode non-breaking space character
 
 struct arg {
     char *start, *end;
@@ -55,12 +55,14 @@ static inline double argtod(struct arg arg)
     return value;
 }
 
-static inline void push_arg(struct arg *args, int *nargs, char *start, char *end)
+static inline void push_arg(struct arg *args, int *nargs, char *start,
+                            char *end)
 {
     if (*nargs <= MAX_VALID_NARGS) {
         rskip_spaces(&end, start);
         if (end > start) {
-            args[*nargs] = (struct arg) {start, end};
+            args[*nargs] = (struct arg) {
+            start, end};
             ++*nargs;
         }
     }
@@ -80,7 +82,7 @@ static inline int mystrcmp(char **p, const char *sample)
         return 0;
 }
 
-double ensure_font_size(ASS_Renderer *priv, double size)
+double ensure_font_size(ASS_Renderer * priv, double size)
 {
     if (size < 1)
         size = 1;
@@ -90,7 +92,7 @@ double ensure_font_size(ASS_Renderer *priv, double size)
     return size;
 }
 
-static void change_font_size(ASS_Renderer *render_priv, double sz)
+static void change_font_size(ASS_Renderer * render_priv, double sz)
 {
     render_priv->state.font_size = sz;
 }
@@ -98,7 +100,7 @@ static void change_font_size(ASS_Renderer *render_priv, double sz)
 /**
  * \brief Change current font, using setting from render_priv->state.
  */
-void update_font(ASS_Renderer *render_priv)
+void update_font(ASS_Renderer * render_priv)
 {
     unsigned val;
     ASS_FontDesc desc;
@@ -114,9 +116,9 @@ void update_font(ASS_Renderer *render_priv)
     val = render_priv->state.bold;
     // 0 = normal, 1 = bold, >1 = exact weight
     if (val == 1 || val == -1)
-        val = 700;               // bold
+        val = 700;              // bold
     else if (val <= 0)
-        val = 400;               // normal
+        val = 400;              // normal
     desc.bold = val;
 
     val = render_priv->state.italic;
@@ -142,7 +144,8 @@ void update_font(ASS_Renderer *render_priv)
  * \param render_priv renderer state object
  * \param info glyph state object
  */
-void change_border(ASS_Renderer *render_priv, double border_x, double border_y)
+void change_border(ASS_Renderer * render_priv, double border_x,
+                   double border_y)
 {
     int bord = 64 * border_x * render_priv->border_scale;
 
@@ -159,7 +162,8 @@ void change_border(ASS_Renderer *render_priv, double border_x, double border_y)
             }
             render_priv->state.stroker_radius = -1.0;
         }
-        if (render_priv->state.stroker && render_priv->state.stroker_radius != bord) {
+        if (render_priv->state.stroker
+            && render_priv->state.stroker_radius != bord) {
             FT_Stroker_Set(render_priv->state.stroker, bord,
                            FT_STROKER_LINECAP_ROUND,
                            FT_STROKER_LINEJOIN_ROUND, 0);
@@ -175,7 +179,7 @@ void change_border(ASS_Renderer *render_priv, double border_x, double border_y)
  * \brief Calculate a weighted average of two colors
  * calculates c1*(1-a) + c2*a, but separately for each component except alpha
  */
-static void change_color(uint32_t *var, uint32_t new, double pwr)
+static void change_color(uint32_t * var, uint32_t new, double pwr)
 {
     (*var) = ((uint32_t) (_r(*var) * (1 - pwr) + _r(new) * pwr) << 24) +
         ((uint32_t) (_g(*var) * (1 - pwr) + _g(new) * pwr) << 16) +
@@ -183,7 +187,7 @@ static void change_color(uint32_t *var, uint32_t new, double pwr)
 }
 
 // like change_color, but for alpha component only
-inline void change_alpha(uint32_t *var, uint32_t new, double pwr)
+inline void change_alpha(uint32_t * var, uint32_t new, double pwr)
 {
     *var =
         (_r(*var) << 24) + (_g(*var) << 16) + (_b(*var) << 8) +
@@ -234,7 +238,7 @@ interpolate_alpha(long long now, long long t1, long long t2, long long t3,
  * Parse a vector clip into an outline, using the proper scaling
  * parameters.  Translate it to correct for screen borders, if needed.
  */
-static int parse_vector_clip(ASS_Renderer *render_priv,
+static int parse_vector_clip(ASS_Renderer * render_priv,
                              struct arg *args, int nargs)
 {
     int scale = 1;
@@ -265,7 +269,7 @@ static int parse_vector_clip(ASS_Renderer *render_priv,
  * \param end end of string to parse, which must be '}' or ')'
  * \param pwr multiplier for some tag effects (comes from \t tags)
  */
-char *parse_tag(ASS_Renderer *render_priv, char *p, char *end, double pwr)
+char *parse_tag(ASS_Renderer * render_priv, char *p, char *end, double pwr)
 {
     while (*p != '\\' && p != end)
         ++p;
@@ -321,7 +325,6 @@ char *parse_tag(ASS_Renderer *render_priv, char *p, char *end, double pwr)
             }
         }
     }
-
 #define tag(name) (mystrcmp(&p, (name)) && (push_arg(args, &nargs, p, name_end), 1))
 #define complex_tag(name) mystrcmp(&p, (name))
 
@@ -567,10 +570,10 @@ char *parse_tag(ASS_Renderer *render_priv, char *p, char *end, double pwr)
         int val = argtoi(*args);
         if ((render_priv->state.parsed_tags & PARSED_A) == 0) {
             if (val >= 1 && val <= 9) {
-                int v = (val - 1) / 3;      // 0, 1 or 2 for vertical alignment
+                int v = (val - 1) / 3;  // 0, 1 or 2 for vertical alignment
                 if (v != 0)
                     v = 3 - v;
-                val = ((val - 1) % 3) + 1;  // horizontal alignment
+                val = ((val - 1) % 3) + 1;      // horizontal alignment
                 val += v * 4;
                 render_priv->state.alignment = val;
             } else
@@ -598,8 +601,9 @@ char *parse_tag(ASS_Renderer *render_priv, char *p, char *end, double pwr)
         } else
             return q;
         if (render_priv->state.evt_type == EVENT_POSITIONED) {
-            ass_msg(render_priv->library, MSGL_V, "Subtitle has a new \\pos "
-                   "after \\move or \\pos, ignoring");
+            ass_msg(render_priv->library, MSGL_V,
+                    "Subtitle has a new \\pos "
+                    "after \\move or \\pos, ignoring");
         } else {
             render_priv->state.evt_type = EVENT_POSITIONED;
             render_priv->state.detect_collisions = 0;
@@ -637,8 +641,8 @@ char *parse_tag(ASS_Renderer *render_priv, char *p, char *end, double pwr)
         if ((render_priv->state.parsed_tags & PARSED_FADE) == 0) {
             render_priv->state.fade =
                 interpolate_alpha(render_priv->time -
-                        render_priv->state.event->Start, t1, t2,
-                        t3, t4, a1, a2, a3);
+                                  render_priv->state.event->Start, t1, t2,
+                                  t3, t4, a1, a2, a3);
             render_priv->state.parsed_tags |= PARSED_FADE;
         }
     } else if (complex_tag("org")) {
@@ -770,7 +774,8 @@ char *parse_tag(ASS_Renderer *render_priv, char *p, char *end, double pwr)
         if (nargs) {
             int len = args->end - args->start;
             reset_render_context(render_priv,
-                    lookup_style_strict(render_priv->track, args->start, len));
+                                 lookup_style_strict(render_priv->track,
+                                                     args->start, len));
         } else
             reset_render_context(render_priv, NULL);
     } else if (tag("be")) {
@@ -779,7 +784,9 @@ char *parse_tag(ASS_Renderer *render_priv, char *p, char *end, double pwr)
             int val;
             dval = argtod(*args);
             // VSFilter always adds +0.5, even if the value is negative
-            val = (int) (render_priv->state.be * (1 - pwr) + dval * pwr + 0.5);
+            val =
+                (int) (render_priv->state.be * (1 - pwr) + dval * pwr +
+                       0.5);
             // Clamp to a safe upper limit, since high values need excessive CPU
             val = (val < 0) ? 0 : val;
             val = (val > MAX_BE) ? MAX_BE : val;
@@ -878,7 +885,7 @@ char *parse_tag(ASS_Renderer *render_priv, char *p, char *end, double pwr)
     return q;
 }
 
-void apply_transition_effects(ASS_Renderer *render_priv, ASS_Event *event)
+void apply_transition_effects(ASS_Renderer * render_priv, ASS_Event * event)
 {
     int v[4];
     int cnt;
@@ -964,11 +971,11 @@ void apply_transition_effects(ASS_Renderer *render_priv, ASS_Event *event)
  * 2. sets effect_timing for all glyphs to x coordinate of the border line between the left and right karaoke parts
  * (left part is filled with PrimaryColour, right one - with SecondaryColour).
  */
-void process_karaoke_effects(ASS_Renderer *render_priv)
+void process_karaoke_effects(ASS_Renderer * render_priv)
 {
     GlyphInfo *cur, *cur2;
-    GlyphInfo *s1, *e1;      // start and end of the current word
-    GlyphInfo *s2;           // start of the next word
+    GlyphInfo *s1, *e1;         // start and end of the current word
+    GlyphInfo *s2;              // start of the next word
     int i;
     int timing;                 // current timing
     int tm_start, tm_end;       // timings at start and end of the current word
@@ -994,8 +1001,12 @@ void process_karaoke_effects(ASS_Renderer *render_priv)
                 x_start = 1000000;
                 x_end = -1000000;
                 for (cur2 = s1; cur2 <= e1; ++cur2) {
-                    x_start = FFMIN(x_start, d6_to_int(cur2->bbox.xMin + cur2->pos.x));
-                    x_end = FFMAX(x_end, d6_to_int(cur2->bbox.xMax + cur2->pos.x));
+                    x_start =
+                        FFMIN(x_start,
+                              d6_to_int(cur2->bbox.xMin + cur2->pos.x));
+                    x_end =
+                        FFMAX(x_end,
+                              d6_to_int(cur2->bbox.xMax + cur2->pos.x));
                 }
 
                 dt = (tm_current - tm_start);
@@ -1031,7 +1042,7 @@ void process_karaoke_effects(ASS_Renderer *render_priv)
  * \return ucs4 code of the next char
  * On return str points to the unparsed part of the string
  */
-unsigned get_next_char(ASS_Renderer *render_priv, char **str)
+unsigned get_next_char(ASS_Renderer * render_priv, char **str)
 {
     char *p = *str;
     unsigned chr;
