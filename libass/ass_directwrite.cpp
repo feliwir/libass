@@ -103,8 +103,8 @@ static size_t get_data(void *data, unsigned char *buf, size_t offset,
         return fileSize;
     }
 
-    hr = priv->stream->ReadFileFragment(&fileBuf, offset, length,
-                                        &fragContext);
+    hr = priv->stream->ReadFileFragment(&fileBuf, offset, length, &fragContext);
+                                        
     if (FAILED(hr) || !fileBuf)
         return 0;
 
@@ -193,69 +193,50 @@ static void scan_fonts(IDWriteFactory * factory,
             meta.width = map_width(font->GetStretch());
             font->GetMetrics(&metrics);
             style = font->GetStyle();
-            meta.slant =
-                (style ==
-                 DWRITE_FONT_STYLE_NORMAL) ? FONT_SLANT_NONE : (style ==
-                                                                DWRITE_FONT_STYLE_OBLIQUE)
-                ? FONT_SLANT_OBLIQUE : (style ==
-                                        DWRITE_FONT_STYLE_ITALIC) ?
-                FONT_SLANT_ITALIC : FONT_SLANT_NONE;
+            meta.slant = (style==DWRITE_FONT_STYLE_NORMAL) ? FONT_SLANT_NONE : 
+                         (style==DWRITE_FONT_STYLE_OBLIQUE)? FONT_SLANT_OBLIQUE : 
+                         (style==DWRITE_FONT_STYLE_ITALIC) ? FONT_SLANT_ITALIC : FONT_SLANT_NONE;
 
-            hr = font->
-                GetInformationalStrings
-                (DWRITE_INFORMATIONAL_STRING_POSTSCRIPT_NAME, &psNames,
-                 &exists);
+            hr = font->GetInformationalStrings(DWRITE_INFORMATIONAL_STRING_POSTSCRIPT_NAME, &psNames,&exists);
+           
             if (FAILED(hr)) {
                 font->Release();
                 continue;
             }
 
-
             if (exists) {
-                hr = psNames->GetString(0, localeName,
-                                        LOCALE_NAME_MAX_LENGTH + 1);
+                hr = psNames->GetString(0, localeName, LOCALE_NAME_MAX_LENGTH + 1);
                 if (FAILED(hr)) {
                     psNames->Release();
                     font->Release();
                     continue;
                 }
 
-                size_needed =
-                    WideCharToMultiByte(CP_UTF8, 0, localeName, -1, NULL, 0,
-                                        NULL, NULL);
+                size_needed = WideCharToMultiByte(CP_UTF8, 0, localeName, -1, NULL, 0,NULL, NULL);
                 psName = (char *) malloc(size_needed);
-                WideCharToMultiByte(CP_UTF8, 0, localeName, -1, psName,
-                                    size_needed, NULL, NULL);
+                WideCharToMultiByte(CP_UTF8, 0, localeName, -1, psName,size_needed, NULL, NULL);
             }
 
             psNames->Release();
 
-            hr = font->
-                GetInformationalStrings
-                (DWRITE_INFORMATIONAL_STRING_FULL_NAME, &fontNames,
-                 &exists);
+            hr = font->GetInformationalStrings(DWRITE_INFORMATIONAL_STRING_FULL_NAME, &fontNames,&exists);
             if (FAILED(hr)) {
                 font->Release();
                 continue;
             }
 
-
             meta.n_fullname = fontNames->GetCount();
-            meta.fullnames =
-                (char **) calloc(meta.n_fullname, sizeof(char *));
+            meta.fullnames = (char **) calloc(meta.n_fullname, sizeof(char *));
             for (UINT32 k = 0; k < meta.n_fullname; ++k) {
-                hr = fontNames->GetString(k, localeName,
-                                          LOCALE_NAME_MAX_LENGTH + 1);
+                hr = fontNames->GetString(k, localeName,LOCALE_NAME_MAX_LENGTH + 1);
+                
                 if (FAILED(hr)) {
                     continue;
                 }
 
-                size_needed =
-                    WideCharToMultiByte(CP_UTF8, 0, localeName, -1, NULL, 0,
-                                        NULL, NULL);
+                size_needed = WideCharToMultiByte(CP_UTF8, 0, localeName, -1, NULL, 0, NULL, NULL);
                 char *mbName = (char *) malloc(size_needed);
-                WideCharToMultiByte(CP_UTF8, 0, localeName, -1, mbName,
-                                    size_needed, NULL, NULL);
+                WideCharToMultiByte(CP_UTF8, 0, localeName, -1, mbName,size_needed, NULL, NULL);
                 meta.fullnames[k] = mbName;
             }
             fontNames->Release();
@@ -270,28 +251,23 @@ static void scan_fonts(IDWriteFactory * factory,
             meta.n_family = familyNames->GetCount();
             meta.families = (char **) calloc(meta.n_family, sizeof(char *));
             for (UINT32 k = 0; k < meta.n_family; ++k) {
-                hr = familyNames->GetString(k, localeName,
-                                            LOCALE_NAME_MAX_LENGTH + 1);
+                hr = familyNames->GetString(k, localeName, LOCALE_NAME_MAX_LENGTH + 1);
+                
                 if (FAILED(hr)) {
                     continue;
                 }
 
-                size_needed =
-                    WideCharToMultiByte(CP_UTF8, 0, localeName, -1, NULL, 0,
-                                        NULL, NULL);
+                size_needed = WideCharToMultiByte(CP_UTF8, 0, localeName, -1, NULL, 0,NULL, NULL);
                 char *mbName = (char *) malloc(size_needed);
-                WideCharToMultiByte(CP_UTF8, 0, localeName, -1, mbName,
-                                    size_needed, NULL, NULL);
+                WideCharToMultiByte(CP_UTF8, 0, localeName, -1, mbName,size_needed, NULL, NULL);
                 meta.families[k] = mbName;
             }
             familyNames->Release();
 
-            FontPrivate *font_priv =
-                (FontPrivate *) calloc(1, sizeof(*font_priv));
+            FontPrivate *font_priv = (FontPrivate *) calloc(1, sizeof(*font_priv));
             font_priv->font = font;
 
-            ass_font_provider_add_font(provider, &meta, NULL, 0, psName,
-                                       font_priv);
+            ass_font_provider_add_font(provider, &meta, NULL, 0, psName, font_priv);
 
             for (UINT32 k = 0; k < meta.n_family; ++k)
                 free(meta.families[k]);
@@ -329,9 +305,7 @@ ASS_FontProvider *ass_directwrite_add_provider(ASS_Library * lib,
         goto exit;
     }
 
-
-    provider =
-        ass_font_provider_new(selector, &directwrite_callbacks, dwFactory);
+    provider = ass_font_provider_new(selector, &directwrite_callbacks, dwFactory);
 
     scan_fonts(dwFactory, provider);
   exit:
