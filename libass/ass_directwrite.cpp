@@ -25,11 +25,21 @@
 extern "C" {
 #include "ass_directwrite.h"
 #include "ass_utils.h"
-} typedef struct {
+} 
+
+/*
+ * The private data stored for every font, detected by this backend.
+ */
+typedef struct {
     IDWriteFont *font;
     IDWriteFontFileStream *stream;
 } FontPrivate;
 
+/*
+ * This function is called whenever a font is used for the first
+ * time. It will create a FontStream for memory reading, which 
+ * will be stored within the private data.
+ */
 static bool init_font_private(FontPrivate * priv)
 {
     HRESULT hr = S_OK;
@@ -83,6 +93,13 @@ static bool init_font_private(FontPrivate * priv)
     return true;
 }
 
+/*
+ * Read a specified part of a fontfile into memory.
+ * If the font wasn't used before first creates a
+ * FontStream and save it into the private data for later usage.
+ * If the parameter "buf" is NULL libass wants to know the
+ * size of the Fontfile
+ */
 static size_t get_data(void *data, unsigned char *buf, size_t offset,
                        size_t length)
 {
@@ -115,6 +132,10 @@ static size_t get_data(void *data, unsigned char *buf, size_t offset,
     return length;
 }
 
+/*
+ * Checks if the passed font has a specific unicode
+ * character. Returns 0 for failure and 1 for success
+ */
 static int check_glyph(void *data, uint32_t code)
 {
     HRESULT hr = S_OK;
@@ -131,10 +152,18 @@ static int check_glyph(void *data, uint32_t code)
     return exists;
 }
 
+/*
+ * This will release the directwrite backend
+ */
 static void destroy_provider(void *priv)
 {
     ((IDWriteFactory *) priv)->Release();
 }
+
+/*
+ * This will destroy a specific font and it's
+ * Fontstream (in case it does exist)
+ */
 
 static void destroy_font(void *data)
 {
@@ -152,6 +181,11 @@ static int map_width(int stretch)
     return stretch * (100 / DWRITE_FONT_STRETCH_MEDIUM);
 }
 
+/*
+ * Scan every system font on the current machine and add it
+ * to the libass lookup. Stores the FontPrivate as private data
+ * for later memory reading
+ */
 static void scan_fonts(IDWriteFactory * factory,
                        ASS_FontProvider * provider)
 {
@@ -178,7 +212,6 @@ static void scan_fonts(IDWriteFactory * factory,
         BOOL exists = FALSE;
         char *psName = NULL;
 
-        // Get the font family.
         hr = fontCollection->GetFontFamily(i, &fontFamily);
         if (FAILED(hr))
             return;
@@ -280,6 +313,10 @@ static void scan_fonts(IDWriteFactory * factory,
     }
 }
 
+/*
+ * Called by libass when the provider should perform the
+ * specified task
+ */
 static ASS_FontProviderFuncs directwrite_callbacks = {
     get_data,
     check_glyph,
@@ -288,6 +325,13 @@ static ASS_FontProviderFuncs directwrite_callbacks = {
     NULL,
 };
 
+
+/*
+ * Register the directwrite provider. Upon registering
+ * scans all system fonts. The private data for this 
+ * provider is IDWriteFactory 
+ * On failure returns NULL
+ */
 ASS_FontProvider *ass_directwrite_add_provider(ASS_Library * lib,
                                                ASS_FontSelector * selector,
                                                const char *config)
@@ -302,13 +346,13 @@ ASS_FontProvider *ass_directwrite_add_provider(ASS_Library * lib,
 
     if (FAILED(hr)) {
         ass_msg(lib, MSGL_WARN, "Failed to initialize directwrite.");
-        goto exit;
+		return NULL;
     }
 
     provider = ass_font_provider_new(selector, &directwrite_callbacks, dwFactory);
 
     scan_fonts(dwFactory, provider);
-  exit:
+
     return provider;
 }
 
