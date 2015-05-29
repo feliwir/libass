@@ -57,22 +57,22 @@ static const char *fallback_fonts[] = {
 // internal font database element
 // all strings are utf-8
 struct font_info {
-    int uid;                    // unique font face id
+    int uid;            // unique font face id
 
-    char **families;            // family name
-    char **fullnames;           // list of localized fullnames (e.g. Arial Bold Italic)
+    char **families;    // family name
+    char **fullnames;   // list of localized fullnames (e.g. Arial Bold Italic)
     int n_family;
     int n_fullname;
 
     int slant;
-    int weight;                 // TrueType scale, 100-900
+    int weight;         // TrueType scale, 100-900
     int width;
 
     // how to access this face
-    char *path;                 // absolute path
-    int index;                  // font index inside font collections
-    char *postscript_name;      // can be used as an alternative to index to
-    // identify a font inside a collection
+    char *path;            // absolute path
+    int index;             // font index inside font collections
+    char *postscript_name; // can be used as an alternative to index to
+                           // identify a font inside a collection
 
     // similarity score
     unsigned score;
@@ -126,7 +126,7 @@ struct font_data_ft {
 static int check_glyph_ft(void *data, uint32_t codepoint)
 {
     int i;
-    CoverageMap *coverage = ((FontDataFT *) data)->coverage;
+    CoverageMap *coverage = ((FontDataFT *)data)->coverage;
 
     if (!codepoint)
         return 1;
@@ -141,7 +141,7 @@ static int check_glyph_ft(void *data, uint32_t codepoint)
 
 static void coverage_map_destroy(void *data)
 {
-    CoverageMap *coverage = (CoverageMap *) data;
+    CoverageMap *coverage = (CoverageMap *)data;
 
     free(coverage->codepoints);
     free(coverage);
@@ -149,7 +149,7 @@ static void coverage_map_destroy(void *data)
 
 static void destroy_font_ft(void *data)
 {
-    FontDataFT *fd = (FontDataFT *) data;
+    FontDataFT *fd = (FontDataFT *)data;
 
     if (fd->coverage)
         coverage_map_destroy(fd->coverage);
@@ -163,7 +163,7 @@ static void destroy_font_ft(void *data)
  * \param library ASS library
  * \param name font name
  */
-static int find_font(ASS_Library * library, char *name)
+static int find_font(ASS_Library *library, char *name)
 {
     int i;
     for (i = 0; i < library->num_fontdata; ++i)
@@ -175,7 +175,7 @@ static int find_font(ASS_Library * library, char *name)
 static size_t
 get_data_embedded(void *data, unsigned char *buf, size_t offset, size_t len)
 {
-    FontDataFT *ft = (FontDataFT *) data;
+    FontDataFT *ft = (FontDataFT *)data;
     ASS_Fontdata *fd = ft->lib->fontdata;
     int i = ft->idx;
 
@@ -204,15 +204,15 @@ static ASS_FontProviderFuncs ft_funcs = {
  * \param data private data of the provider
  * \return the font provider
  */
-ASS_FontProvider *ass_font_provider_new(ASS_FontSelector * selector,
-                                        ASS_FontProviderFuncs * funcs,
-                                        void *data)
+ASS_FontProvider *
+ass_font_provider_new(ASS_FontSelector *selector, ASS_FontProviderFuncs *funcs,
+                      void *data)
 {
     ASS_FontProvider *provider = calloc(1, sizeof(ASS_FontProvider));
 
-    provider->parent = selector;
-    provider->funcs = *funcs;
-    provider->priv = data;
+    provider->parent   = selector;
+    provider->funcs    = *funcs;
+    provider->priv     = data;
 
     return provider;
 }
@@ -228,10 +228,9 @@ ASS_FontProvider *ass_font_provider_new(ASS_FontSelector * selector,
  * \return success
  */
 int
-ass_font_provider_add_font(ASS_FontProvider * provider,
-                           ASS_FontProviderMetaData * meta,
-                           const char *path, unsigned int index,
-                           const char *psname, void *data)
+ass_font_provider_add_font(ASS_FontProvider *provider,
+                           ASS_FontProviderMetaData *meta, const char *path,
+                           unsigned int index, const char *psname, void *data)
 {
     int i;
     int weight, slant, width;
@@ -257,8 +256,8 @@ ass_font_provider_add_font(ASS_FontProvider * provider,
 #endif
 
     weight = meta->weight;
-    slant = meta->slant;
-    width = meta->width;
+    slant  = meta->slant;
+    width  = meta->width;
 
     // check slant/weight for validity, use defaults if they're invalid
     if (weight < 100 || weight > 900)
@@ -272,9 +271,9 @@ ass_font_provider_add_font(ASS_FontProvider * provider,
     if (selector->n_font >= selector->alloc_font) {
         selector->alloc_font = FFMAX(1, 2 * selector->alloc_font);
         selector->font_infos = realloc(selector->font_infos,
-                                       selector->alloc_font *
-                                       sizeof(ASS_FontInfo));
+                selector->alloc_font * sizeof(ASS_FontInfo));
     }
+
     // copy over metadata
     info = selector->font_infos + selector->n_font;
     memset(info, 0, sizeof(ASS_FontInfo));
@@ -282,13 +281,13 @@ ass_font_provider_add_font(ASS_FontProvider * provider,
     // set uid
     info->uid = selector->uid++;
 
-    info->slant = slant;
-    info->weight = weight;
-    info->width = width;
-    info->n_fullname = meta->n_fullname;
-    info->n_family = meta->n_family;
-    info->fullnames = calloc(meta->n_fullname, sizeof(char *));
-    info->families = calloc(meta->n_family, sizeof(char *));
+    info->slant       = slant;
+    info->weight      = weight;
+    info->width       = width;
+    info->n_fullname  = meta->n_fullname;
+    info->n_family    = meta->n_family;
+    info->fullnames   = calloc(meta->n_fullname, sizeof(char *));
+    info->families    = calloc(meta->n_family, sizeof(char *));
 
     for (i = 0; i < info->n_family; i++)
         info->families[i] = strdup(meta->families[i]);
@@ -303,7 +302,7 @@ ass_font_provider_add_font(ASS_FontProvider * provider,
         info->postscript_name = strdup(psname);
 
     info->index = index;
-    info->priv = data;
+    info->priv  = data;
     info->provider = provider;
 
     selector->n_font++;
@@ -316,7 +315,7 @@ ass_font_provider_add_font(ASS_FontProvider * provider,
  * font provider (NULL).
  * \param selector the font selector
  */
-static void ass_fontselect_cleanup(ASS_FontSelector * selector)
+static void ass_fontselect_cleanup(ASS_FontSelector *selector)
 {
     int i, w;
 
@@ -328,7 +327,7 @@ static void ass_fontselect_cleanup(ASS_FontSelector * selector)
             // rewrite, if needed
             if (w != i)
                 memcpy(selector->font_infos + w, selector->font_infos + i,
-                       sizeof(ASS_FontInfo));
+                        sizeof(ASS_FontInfo));
             w++;
         }
 
@@ -337,7 +336,7 @@ static void ass_fontselect_cleanup(ASS_FontSelector * selector)
     selector->n_font = w;
 }
 
-void ass_font_provider_free(ASS_FontProvider * provider)
+void ass_font_provider_free(ASS_FontProvider *provider)
 {
     int i, j;
     ASS_FontSelector *selector = provider->parent;
@@ -388,7 +387,7 @@ void ass_font_provider_free(ASS_FontProvider * provider)
  * \param b font request
  * \return matching score
  */
-static unsigned font_info_similarity(ASS_FontInfo * a, ASS_FontInfo * req)
+static unsigned font_info_similarity(ASS_FontInfo *a, ASS_FontInfo *req)
 {
     int i, j;
     unsigned similarity = 0;
@@ -411,6 +410,7 @@ static unsigned font_info_similarity(ASS_FontInfo * a, ASS_FontInfo * req)
                     similarity = 0;
             }
     }
+
     // compare slant
     similarity += ABS(a->slant - req->slant);
 
@@ -424,8 +424,8 @@ static unsigned font_info_similarity(ASS_FontInfo * a, ASS_FontInfo * req)
 }
 
 // calculate scores
-static void font_info_req_similarity(ASS_FontInfo * font_infos, size_t len,
-                                     ASS_FontInfo * req)
+static void font_info_req_similarity(ASS_FontInfo *font_infos, size_t len,
+                                     ASS_FontInfo *req)
 {
     int i;
 
@@ -435,7 +435,7 @@ static void font_info_req_similarity(ASS_FontInfo * font_infos, size_t len,
 
 #if 0
 // dump font information
-static void font_info_dump(ASS_FontInfo * font_infos, size_t len)
+static void font_info_dump(ASS_FontInfo *font_infos, size_t len)
 {
     int i, j;
 
@@ -468,10 +468,10 @@ static int font_info_compare(const void *av, const void *bv)
     return a->score - b->score;
 }
 
-static char *select_font(ASS_FontSelector * priv, ASS_Library * library,
+static char *select_font(ASS_FontSelector *priv, ASS_Library *library,
                          const char *family, unsigned bold, unsigned italic,
                          int *index, char **postscript_name, int *uid,
-                         ASS_FontStream * stream, uint32_t code)
+                         ASS_FontStream *stream, uint32_t code)
 {
     int num_fonts = priv->n_font;
     int idx = 0;
@@ -481,8 +481,7 @@ static char *select_font(ASS_FontSelector * priv, ASS_Library * library,
 
     ASS_FontProvider *default_provider = priv->default_provider;
     if (default_provider && default_provider->funcs.match_fonts)
-        default_provider->funcs.match_fonts(library, default_provider,
-                                            tfamily);
+        default_provider->funcs.match_fonts(library, default_provider, tfamily);
 
     ASS_FontInfo *font_infos = priv->font_infos;
 
@@ -492,18 +491,19 @@ static char *select_font(ASS_FontSelector * priv, ASS_Library * library,
 
     // fill font request
     memset(&req, 0, sizeof(ASS_FontInfo));
-    req.slant = italic;
-    req.weight = bold;
-    req.width = 100;
-    req.n_fullname = 1;
-    req.fullnames = &req_fullname;
+    req.slant   = italic;
+    req.weight  = bold;
+    req.width   = 100;
+    req.n_fullname   = 1;
+    req.fullnames    = &req_fullname;
     req.fullnames[0] = tfamily;
 
     // calculate similarities
     font_info_req_similarity(font_infos, num_fonts, &req);
 
     // sort
-    qsort(font_infos, num_fonts, sizeof(ASS_FontInfo), font_info_compare);
+    qsort(font_infos, num_fonts, sizeof(ASS_FontInfo),
+            font_info_compare);
 
     // check glyph coverage
     while (idx < priv->n_font) {
@@ -521,7 +521,7 @@ static char *select_font(ASS_FontSelector * priv, ASS_Library * library,
 
     *postscript_name = font_infos[idx].postscript_name;
     *index = font_infos[idx].index;
-    *uid = font_infos[idx].uid;
+    *uid   = font_infos[idx].uid;
 
     // nothing found
     if (idx == priv->n_font)
@@ -551,9 +551,9 @@ static char *select_font(ASS_FontSelector * priv, ASS_Library * library,
  * \param code: the character that should be present in the font, can be 0
  * \return font file path
 */
-char *ass_font_select(ASS_FontSelector * priv, ASS_Library * library,
-                      ASS_Font * font, int *index, char **postscript_name,
-                      int *uid, ASS_FontStream * data, uint32_t code)
+char *ass_font_select(ASS_FontSelector *priv, ASS_Library *library,
+                      ASS_Font *font, int *index, char **postscript_name,
+                      int *uid, ASS_FontStream *data, uint32_t code)
 {
     char *res = 0;
     const char *family = font->desc.family;
@@ -562,11 +562,11 @@ char *ass_font_select(ASS_FontSelector * priv, ASS_Library * library,
 
     if (family && *family)
         res = select_font(priv, library, family, bold, italic, index,
-                          postscript_name, uid, data, code);
+                postscript_name, uid, data, code);
 
     if (!res && priv->family_default) {
         res = select_font(priv, library, priv->family_default, bold,
-                          italic, index, postscript_name, uid, data, code);
+                italic, index, postscript_name, uid, data, code);
         if (res)
             ass_msg(library, MSGL_WARN, "fontselect: Using default "
                     "font family: (%s, %d, %d) -> %s, %d, %s",
@@ -587,13 +587,11 @@ char *ass_font_select(ASS_FontSelector * priv, ASS_Library * library,
         // the ASS_FontProvider used provides only the MatchFontsFunc callback
         for (int i = 0; fallback_fonts[i] && !res; i++) {
             res = select_font(priv, library, fallback_fonts[i], bold,
-                              italic, index, postscript_name, uid, data,
-                              code);
+                    italic, index, postscript_name, uid, data, code);
             if (res)
                 ass_msg(library, MSGL_WARN, "fontselect: Using fallback "
                         "font family: (%s, %d, %d) -> %s, %d, %s",
-                        family, bold, italic, res, *index,
-                        *postscript_name);
+                        family, bold, italic, res, *index, *postscript_name);
         }
     }
 
@@ -615,11 +613,11 @@ char *ass_font_select(ASS_FontSelector * priv, ASS_Library * library,
  * \return success
  */
 static int
-get_font_info(FT_Library lib, FT_Face face, ASS_FontProviderMetaData * info)
+get_font_info(FT_Library lib, FT_Face face, ASS_FontProviderMetaData *info)
 {
     int i;
     int num_fullname = 0;
-    int num_family = 0;
+    int num_family   = 0;
     int num_names = FT_Get_Sfnt_Name_Count(face);
     int slant, weight;
     char *fullnames[MAX_FULLNAME];
@@ -637,15 +635,13 @@ get_font_info(FT_Library lib, FT_Face face, ASS_FontProviderMetaData * info)
 
         FT_Get_Sfnt_Name(face, i, &name);
 
-        if (name.platform_id == 3
-            && (name.name_id == 4 || name.name_id == 1)) {
+        if (name.platform_id == 3 && (name.name_id == 4 || name.name_id == 1)) {
             char buf[1024];
             char *bufptr = buf;
             size_t inbytes = name.string_len;
             size_t outbytes = 1024;
 
-            iconv(utf16to8, (char **) &name.string, &inbytes, &bufptr,
-                  &outbytes);
+            iconv(utf16to8, (char**)&name.string, &inbytes, &bufptr, &outbytes);
             *bufptr = '\0';
 
             if (name.name_id == 4) {
@@ -667,19 +663,20 @@ get_font_info(FT_Library lib, FT_Face face, ASS_FontProviderMetaData * info)
         families[0] = strdup(face->family_name);
         num_family++;
     }
+
     // calculate sensible slant and weight from style attributes
-    slant = 110 * ! !(face->style_flags & FT_STYLE_FLAG_ITALIC);
-    weight = 300 * ! !(face->style_flags & FT_STYLE_FLAG_BOLD) + 400;
+    slant  = 110 * !!(face->style_flags & FT_STYLE_FLAG_ITALIC);
+    weight = 300 * !!(face->style_flags & FT_STYLE_FLAG_BOLD) + 400;
 
     // fill our struct
-    info->slant = slant;
+    info->slant  = slant;
     info->weight = weight;
-    info->width = 100;          // FIXME, should probably query the OS/2 table
-    info->families = calloc(sizeof(char *), num_family);
+    info->width  = 100;     // FIXME, should probably query the OS/2 table
+    info->families  = calloc(sizeof(char *), num_family);
     info->fullnames = calloc(sizeof(char *), num_fullname);
     memcpy(info->families, &families, sizeof(char *) * num_family);
     memcpy(info->fullnames, &fullnames, sizeof(char *) * num_fullname);
-    info->n_family = num_family;
+    info->n_family   = num_family;
     info->n_fullname = num_fullname;
 
     return 1;
@@ -690,7 +687,7 @@ get_font_info(FT_Library lib, FT_Face face, ASS_FontProviderMetaData * info)
  * created by get_font_info.
  * \param meta metadata created by get_font_info
  */
-static void free_font_info(ASS_FontProviderMetaData * meta)
+static void free_font_info(ASS_FontProviderMetaData *meta)
 {
     int i;
 
@@ -746,7 +743,7 @@ static CoverageMap *get_coverage_map(FT_Face face)
  *
  * Builds a font pattern in memory via FT_New_Memory_Face/FcFreeTypeQueryFace.
 */
-static void process_fontdata(ASS_FontProvider * priv, ASS_Library * library,
+static void process_fontdata(ASS_FontProvider *priv, ASS_Library *library,
                              FT_Library ftlibrary, int idx)
 {
     int rc;
@@ -765,7 +762,7 @@ static void process_fontdata(ASS_FontProvider * priv, ASS_Library * library,
                                 data_size, face_index, &face);
         if (rc) {
             ass_msg(library, MSGL_WARN, "Error opening memory font: %s",
-                    name);
+                   name);
             return;
         }
 
@@ -780,10 +777,10 @@ static void process_fontdata(ASS_FontProvider * priv, ASS_Library * library,
         }
 
         ft = calloc(1, sizeof(FontDataFT));
-        ft->lib = library;
+        ft->lib      = library;
         ft->coverage = get_coverage_map(face);
-        ft->name = strdup(name);
-        ft->idx = -1;
+        ft->name     = strdup(name);
+        ft->idx      = -1;
 
         ass_font_provider_add_font(priv, &info, NULL, face_index, NULL, ft);
 
@@ -800,14 +797,12 @@ static void process_fontdata(ASS_FontProvider * priv, ASS_Library * library,
  * \param ftlib FreeType library - used for querying fonts
  * \return font provider
  */
-static ASS_FontProvider *ass_embedded_fonts_add_provider(ASS_Library * lib,
-                                                         ASS_FontSelector *
-                                                         selector,
-                                                         FT_Library ftlib)
+static ASS_FontProvider *
+ass_embedded_fonts_add_provider(ASS_Library *lib, ASS_FontSelector *selector,
+                                FT_Library ftlib)
 {
     int i;
-    ASS_FontProvider *priv =
-        ass_font_provider_new(selector, &ft_funcs, NULL);
+    ASS_FontProvider *priv = ass_font_provider_new(selector, &ft_funcs, NULL);
 
     for (i = 0; i < lib->num_fontdata; ++i)
         process_fontdata(priv, lib, ftlib, i);
@@ -817,21 +812,21 @@ static ASS_FontProvider *ass_embedded_fonts_add_provider(ASS_Library * lib,
 
 struct font_constructors {
     ASS_DefaultFontProvider id;
-    ASS_FontProvider *(*constructor) (ASS_Library *, ASS_FontSelector *,
-                                      const char *);
+    ASS_FontProvider *(*constructor)(ASS_Library *, ASS_FontSelector *,
+                                     const char *);
 };
 
 struct font_constructors font_constructors[] = {
 #ifdef CONFIG_CORETEXT
-    {ASS_FONTPROVIDER_CORETEXT, &ass_coretext_add_provider},
+    { ASS_FONTPROVIDER_CORETEXT,   &ass_coretext_add_provider },
 #endif
 #ifdef CONFIG_FONTCONFIG
-    {ASS_FONTPROVIDER_FONTCONFIG, &ass_fontconfig_add_provider},
+    { ASS_FONTPROVIDER_FONTCONFIG, &ass_fontconfig_add_provider },
 #endif
 #ifdef CONFIG_DIRECTWRITE
-    {ASS_FONTPROVIDER_DIRECTWRITE, &ass_directwrite_add_provider},
+    { ASS_FONTPROVIDER_DIRECTWRITE, &ass_directwrite_add_provider },
 #endif
-    {ASS_FONTPROVIDER_NONE, NULL},
+    { ASS_FONTPROVIDER_NONE, NULL },
 };
 
 /**
@@ -842,11 +837,11 @@ struct font_constructors font_constructors[] = {
  * \param path default font path
  * \return newly created font selector
  */
-ASS_FontSelector *ass_fontselect_init(ASS_Library * library,
-                                      FT_Library ftlibrary,
-                                      const char *family, const char *path,
-                                      const char *config,
-                                      ASS_DefaultFontProvider dfp)
+ASS_FontSelector *
+ass_fontselect_init(ASS_Library *library,
+                    FT_Library ftlibrary, const char *family,
+                    const char *path, const char *config,
+                    ASS_DefaultFontProvider dfp)
 {
     ASS_FontSelector *priv = calloc(1, sizeof(ASS_FontSelector));
 
@@ -856,11 +851,11 @@ ASS_FontSelector *ass_fontselect_init(ASS_Library * library,
     priv->index_default = 0;
 
     priv->embedded_provider = ass_embedded_fonts_add_provider(library, priv,
-                                                              ftlibrary);
+            ftlibrary);
 
     if (dfp >= ASS_FONTPROVIDER_AUTODETECT) {
         int found = 0;
-        for (int i = 0; !found && font_constructors[i].constructor; i++)
+        for (int i = 0; !found && font_constructors[i].constructor; i++ )
             if (dfp == font_constructors[i].id ||
                 dfp == ASS_FONTPROVIDER_AUTODETECT) {
                 priv->default_provider =
@@ -869,17 +864,16 @@ ASS_FontSelector *ass_fontselect_init(ASS_Library * library,
             }
 
         if (!found)
-            ass_msg(library, MSGL_WARN,
-                    "can't find selected font provider");
+            ass_msg(library, MSGL_WARN, "can't find selected font provider");
 
     }
 
     return priv;
 }
 
-void ass_get_available_font_providers(ASS_Library * priv,
-                                      ASS_DefaultFontProvider ** providers,
-                                      size_t * size)
+void ass_get_available_font_providers(ASS_Library *priv,
+                                      ASS_DefaultFontProvider **providers,
+                                      size_t *size)
 {
     size_t offset = 2;
     *size = offset;
@@ -889,14 +883,14 @@ void ass_get_available_font_providers(ASS_Library * priv,
     (*providers)[0] = ASS_FONTPROVIDER_NONE;
     (*providers)[1] = ASS_FONTPROVIDER_AUTODETECT;
     for (int i = offset; i < *size; i++)
-        (*providers)[i] = font_constructors[i - offset].id;
+        (*providers)[i] = font_constructors[i-offset].id;
 }
 
 /**
  * \brief Free font selector and release associated data
  * \param the font selector
  */
-void ass_fontselect_free(ASS_FontSelector * priv)
+void ass_fontselect_free(ASS_FontSelector *priv)
 {
     if (priv->default_provider)
         ass_font_provider_free(priv->default_provider);

@@ -64,8 +64,7 @@ static int check_glyph(void *priv, uint32_t code)
 
 static char *get_font_file(CTFontDescriptorRef fontd)
 {
-    CFURLRef url =
-        CTFontDescriptorCopyAttribute(fontd, kCTFontURLAttribute);
+    CFURLRef url = CTFontDescriptorCopyAttribute(fontd, kCTFontURLAttribute);
     CFStringRef path = CFURLCopyFileSystemPath(url, kCFURLPOSIXPathStyle);
     char *buffer = cfstr2buf(path);
     CFRelease(path);
@@ -94,7 +93,7 @@ static void get_trait(CFDictionaryRef traits, CFStringRef attribute,
 }
 
 static void get_font_traits(CTFontDescriptorRef fontd,
-                            ASS_FontProviderMetaData * meta)
+                            ASS_FontProviderMetaData *meta)
 {
     float weight, slant, width;
 
@@ -102,8 +101,8 @@ static void get_font_traits(CTFontDescriptorRef fontd,
         CTFontDescriptorCopyAttribute(fontd, kCTFontTraitsAttribute);
 
     get_trait(traits, kCTFontWeightTrait, &weight);
-    get_trait(traits, kCTFontSlantTrait, &slant);
-    get_trait(traits, kCTFontWidthTrait, &width);
+    get_trait(traits, kCTFontSlantTrait,  &slant);
+    get_trait(traits, kCTFontWidthTrait,  &width);
 
     CFRelease(traits);
 
@@ -129,33 +128,33 @@ static void get_font_traits(CTFontDescriptorRef fontd,
         meta->weight = 200;
 
     if (slant > 0.03)
-        meta->slant = FONT_SLANT_ITALIC;
+        meta->slant  = FONT_SLANT_ITALIC;
     else
-        meta->slant = FONT_SLANT_NONE;
+        meta->slant  = FONT_SLANT_NONE;
 
     if (width <= -0.2)
         meta->width = FONT_WIDTH_CONDENSED;
     else if (width >= 0.2)
         meta->width = FONT_WIDTH_EXPANDED;
     else
-        meta->width = FONT_WIDTH_NORMAL;
+        meta->width  = FONT_WIDTH_NORMAL;
 
 #if 0
     char *name[1];
     int idx = 0;
     get_name(fontd, kCTFontDisplayNameAttribute, name, &idx);
     char *file = get_font_file(fontd);
-    printf("Font traits for: %-40s [%-50s] "
-           "<slant: %f, %03d>, <weight: (%f, %03d)>, <width: %f, %03d>\n",
-           name[0], file,
-           slant, meta->slant, weight, meta->weight, width, meta->width);
+    printf(
+       "Font traits for: %-40s [%-50s] "
+       "<slant: %f, %03d>, <weight: (%f, %03d)>, <width: %f, %03d>\n",
+       name[0], file,
+       slant, meta->slant, weight, meta->weight, width, meta->width);
     free(name[0]);
     free(file);
 #endif
 }
 
-static void process_descriptors(ASS_FontProvider * provider,
-                                CFArrayRef fontsd)
+static void process_descriptors(ASS_FontProvider *provider, CFArrayRef fontsd)
 {
     ASS_FontProviderMetaData meta;
     char *families[1];
@@ -179,20 +178,18 @@ static void process_descriptors(ASS_FontProvider * provider,
         memset(&meta, 0, sizeof(meta));
         get_font_traits(fontd, &meta);
 
-        get_name(fontd, kCTFontFamilyNameAttribute, families,
-                 &meta.n_family);
+        get_name(fontd, kCTFontFamilyNameAttribute, families, &meta.n_family);
         meta.families = families;
 
         int zero = 0;
         get_name(fontd, kCTFontNameAttribute, identifiers, &zero);
-        get_name(fontd, kCTFontDisplayNameAttribute, fullnames,
-                 &meta.n_fullname);
+        get_name(fontd, kCTFontDisplayNameAttribute, fullnames, &meta.n_fullname);
         meta.fullnames = fullnames;
 
-        CFCharacterSetRef chset = CTFontDescriptorCopyAttribute(fontd,
-                                                                kCTFontCharacterSetAttribute);
+        CFCharacterSetRef chset =
+            CTFontDescriptorCopyAttribute(fontd, kCTFontCharacterSetAttribute);
         ass_font_provider_add_font(provider, &meta, path, index,
-                                   identifiers[0], (void *) chset);
+                                   identifiers[0], (void*)chset);
 
         for (int j = 0; j < meta.n_family; j++)
             free(meta.families[j]);
@@ -207,11 +204,10 @@ static void process_descriptors(ASS_FontProvider * provider,
 }
 
 #if CT_FONTS_EAGER_LOAD
-static void scan_fonts(ASS_Library * lib, ASS_FontProvider * provider)
+static void scan_fonts(ASS_Library *lib, ASS_FontProvider *provider)
 {
 
-    CTFontCollectionRef coll =
-        CTFontCollectionCreateFromAvailableFonts(NULL);
+    CTFontCollectionRef coll = CTFontCollectionCreateFromAvailableFonts(NULL);
     CFArrayRef fontsd = CTFontCollectionCreateMatchingFontDescriptors(coll);
 
     process_descriptors(provider, fontsd);
@@ -222,7 +218,7 @@ static void scan_fonts(ASS_Library * lib, ASS_FontProvider * provider)
 #endif
 
 #if CT_FONTS_LAZY_LOAD
-static void match_fonts(ASS_Library * lib, ASS_FontProvider * provider,
+static void match_fonts(ASS_Library *lib, ASS_FontProvider *provider,
                         char *name)
 {
     const size_t attributes_n = 3;
@@ -244,7 +240,7 @@ static void match_fonts(ASS_Library * lib, ASS_FontProvider * provider,
     }
 
     CFArrayRef descriptors =
-        CFArrayCreate(NULL, (const void **) &ctdescrs, attributes_n, NULL);
+        CFArrayCreate(NULL, (const void **)&ctdescrs, attributes_n, NULL);
 
     CTFontCollectionRef ctcoll =
         CTFontCollectionCreateWithFontDescriptors(descriptors, 0);
@@ -280,9 +276,9 @@ static ASS_FontProviderFuncs coretext_callbacks = {
 #endif
 };
 
-ASS_FontProvider *ass_coretext_add_provider(ASS_Library * lib,
-                                            ASS_FontSelector * selector,
-                                            const char *config)
+ASS_FontProvider *
+ass_coretext_add_provider(ASS_Library *lib, ASS_FontSelector *selector,
+                          const char *config)
 {
     ASS_FontProvider *provider =
         ass_font_provider_new(selector, &coretext_callbacks, NULL);

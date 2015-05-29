@@ -85,7 +85,7 @@ typedef struct {
     double par;                 // user defined pixel aspect ratio (0 = unset)
     ASS_Hinting hinting;
     ASS_ShapingLevel shaper;
-    int selective_style_overrides;      // ASS_OVERRIDE_* flags
+    int selective_style_overrides; // ASS_OVERRIDE_* flags
 
     char *default_font;
     char *default_family;
@@ -107,7 +107,8 @@ typedef enum {
     EF_KARAOKE_KO
 } Effect;
 
-typedef struct {
+typedef struct
+{
     int x_min, y_min, x_max, y_max;
 } Rectangle;
 
@@ -169,7 +170,7 @@ typedef struct glyph_info {
     double frx, fry, frz;       // rotation
     double fax, fay;            // text shearing
     double scale_x, scale_y;
-    double orig_scale_x, orig_scale_y;  // scale_x,y before fix_glyph_scaling
+    double orig_scale_x, orig_scale_y; // scale_x,y before fix_glyph_scaling
     int border_style;
     double border_x, border_y;
     double hspacing;
@@ -290,15 +291,16 @@ typedef struct {
     size_t composite_max_size;
 } CacheStore;
 
-typedef void (*BitmapBlendFunc) (uint8_t * dst, intptr_t dst_stride,
-                                 uint8_t * src, intptr_t src_stride,
-                                 intptr_t height, intptr_t width);
-typedef void (*BitmapMulFunc) (uint8_t * dst, intptr_t dst_stride,
-                               uint8_t * src1, intptr_t src1_stride,
-                               uint8_t * src2, intptr_t src2_stride,
-                               intptr_t width, intptr_t height);
-typedef void (*BEBlurFunc) (uint8_t * buf, intptr_t w,
-                            intptr_t h, intptr_t stride, uint16_t * tmp);
+typedef void (*BitmapBlendFunc)(uint8_t *dst, intptr_t dst_stride,
+                                uint8_t *src, intptr_t src_stride,
+                                intptr_t height, intptr_t width);
+typedef void (*BitmapMulFunc)(uint8_t *dst, intptr_t dst_stride,
+                              uint8_t *src1, intptr_t src1_stride,
+                              uint8_t *src2, intptr_t src2_stride,
+                              intptr_t width, intptr_t height);
+typedef void (*BEBlurFunc)(uint8_t *buf, intptr_t w,
+                           intptr_t h, intptr_t stride,
+                           uint16_t *tmp);
 
 struct ass_renderer {
     ASS_Library *library;
@@ -363,10 +365,10 @@ typedef struct {
     int ha, hb;                 // left and width
 } Segment;
 
-void reset_render_context(ASS_Renderer * render_priv, ASS_Style * style);
-void ass_free_images(ASS_Image * img);
+void reset_render_context(ASS_Renderer *render_priv, ASS_Style *style);
+void ass_free_images(ASS_Image *img);
 
 // XXX: this is actually in ass.c, includes should be fixed later on
-void ass_lazy_track_init(ASS_Library * lib, ASS_Track * track);
+void ass_lazy_track_init(ASS_Library *lib, ASS_Track *track);
 
-#endif                          /* LIBASS_RENDER_H */
+#endif /* LIBASS_RENDER_H */

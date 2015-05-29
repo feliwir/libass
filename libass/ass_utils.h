@@ -85,19 +85,19 @@ void skip_spaces(char **str);
 void rskip_spaces(char **str, char *limit);
 int mystrtoi(char **p, int *res);
 int mystrtoll(char **p, long long *res);
-int mystrtou32(char **p, int base, uint32_t * res);
+int mystrtou32(char **p, int base, uint32_t *res);
 int mystrtod(char **p, double *res);
-uint32_t string2color(ASS_Library * library, char *p, int hex);
+uint32_t string2color(ASS_Library *library, char *p, int hex);
 char *trim_space(char *str);
 char parse_bool(char *str);
 int parse_ycbcr_matrix(char *str);
 unsigned ass_utf8_get_char(char **str);
 unsigned ass_utf8_put_char(char *dest, uint32_t ch);
-void ass_msg(ASS_Library * priv, int lvl, char *fmt, ...);
-int lookup_style(ASS_Track * track, char *name);
-ASS_Style *lookup_style_strict(ASS_Track * track, char *name, size_t len);
+void ass_msg(ASS_Library *priv, int lvl, char *fmt, ...);
+int lookup_style(ASS_Track *track, char *name);
+ASS_Style *lookup_style_strict(ASS_Track *track, char *name, size_t len);
 #ifdef CONFIG_ENCA
-void *ass_guess_buffer_cp(ASS_Library * library, unsigned char *buffer,
+void *ass_guess_buffer_cp(ASS_Library *library, unsigned char *buffer,
                           int buflen, char *preferred_language,
                           char *fallback);
 #endif
@@ -116,57 +116,46 @@ static inline int d6_to_int(int x)
 {
     return (x + 32) >> 6;
 }
-
 static inline int d16_to_int(int x)
 {
     return (x + 32768) >> 16;
 }
-
 static inline int int_to_d6(int x)
 {
     return x * (1 << 6);
 }
-
 static inline int int_to_d16(int x)
 {
     return x * (1 << 16);
 }
-
 static inline int d16_to_d6(int x)
 {
     return (x + 512) >> 10;
 }
-
 static inline int d6_to_d16(int x)
 {
     return x * (1 << 10);
 }
-
 static inline double d6_to_double(int x)
 {
     return x / 64.;
 }
-
 static inline int double_to_d6(double x)
 {
     return (int) (x * 64);
 }
-
 static inline double d16_to_double(int x)
 {
     return ((double) x) / 0x10000;
 }
-
 static inline int double_to_d16(double x)
 {
     return (int) (x * 0x10000);
 }
-
 static inline double d22_to_double(int x)
 {
     return ((double) x) / 0x400000;
 }
-
 static inline int double_to_d22(double x)
 {
     return (int) (x * 0x400000);
@@ -183,29 +172,19 @@ static inline int rot_key(double a)
 
 static inline unsigned fnv_32a_buf(void *buf, size_t len, unsigned hval)
 {
-    unsigned char *bp = (unsigned char *) buf;
+    unsigned char *bp = (unsigned char*)buf;
     size_t n = (len + 3) / 4;
 
     switch (len % 4) {
-    case 0:
-        do {
-            hval ^= (unsigned) *bp++;
-            hval *= FNV1_32A_PRIME;
-    case 3:
-            hval ^= (unsigned) *bp++;
-            hval *= FNV1_32A_PRIME;
-    case 2:
-            hval ^= (unsigned) *bp++;
-            hval *= FNV1_32A_PRIME;
-    case 1:
-            hval ^= (unsigned) *bp++;
-            hval *= FNV1_32A_PRIME;
-        } while (--n > 0);
+    case 0: do { hval ^= (unsigned) *bp++; hval *= FNV1_32A_PRIME;
+    case 3:      hval ^= (unsigned) *bp++; hval *= FNV1_32A_PRIME;
+    case 2:      hval ^= (unsigned) *bp++; hval *= FNV1_32A_PRIME;
+    case 1:      hval ^= (unsigned) *bp++; hval *= FNV1_32A_PRIME;
+               } while (--n > 0);
     }
 
     return hval;
 }
-
 static inline unsigned fnv_32a_str(char *str, unsigned hval)
 {
     unsigned char *s = (unsigned char *) str;

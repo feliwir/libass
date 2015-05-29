@@ -63,7 +63,7 @@ int ass_library_version(void)
     return LIBASS_VERSION;
 }
 
-void ass_free_track(ASS_Track * track)
+void ass_free_track(ASS_Track *track)
 {
     int i;
 
@@ -92,7 +92,7 @@ void ass_free_track(ASS_Track * track)
 /// \brief Allocate a new style struct
 /// \param track track
 /// \return style id
-int ass_alloc_style(ASS_Track * track)
+int ass_alloc_style(ASS_Track *track)
 {
     int sid;
 
@@ -102,7 +102,8 @@ int ass_alloc_style(ASS_Track * track)
         track->max_styles += ASS_STYLES_ALLOC;
         track->styles =
             (ASS_Style *) realloc(track->styles,
-                                  sizeof(ASS_Style) * track->max_styles);
+                                  sizeof(ASS_Style) *
+                                  track->max_styles);
     }
 
     sid = track->n_styles++;
@@ -113,7 +114,7 @@ int ass_alloc_style(ASS_Track * track)
 /// \brief Allocate a new event struct
 /// \param track track
 /// \return event id
-int ass_alloc_event(ASS_Track * track)
+int ass_alloc_event(ASS_Track *track)
 {
     int eid;
 
@@ -123,7 +124,8 @@ int ass_alloc_event(ASS_Track * track)
         track->max_events = track->max_events * 2 + 1;
         track->events =
             (ASS_Event *) realloc(track->events,
-                                  sizeof(ASS_Event) * track->max_events);
+                                  sizeof(ASS_Event) *
+                                  track->max_events);
     }
 
     eid = track->n_events++;
@@ -131,7 +133,7 @@ int ass_alloc_event(ASS_Track * track)
     return eid;
 }
 
-void ass_free_event(ASS_Track * track, int eid)
+void ass_free_event(ASS_Track *track, int eid)
 {
     ASS_Event *event = track->events + eid;
 
@@ -141,7 +143,7 @@ void ass_free_event(ASS_Track * track, int eid)
     free(event->render_priv);
 }
 
-void ass_free_style(ASS_Track * track, int sid)
+void ass_free_style(ASS_Track *track, int sid)
 {
     ASS_Style *style = track->styles + sid;
 
@@ -157,27 +159,27 @@ void ass_free_style(ASS_Track * track, int sid)
  * The parameters are mostly taken directly from VSFilter source for
  * best compatibility.
  */
-static void set_default_style(ASS_Style * style)
+static void set_default_style(ASS_Style *style)
 {
-    style->Name = strdup("Default");
-    style->FontName = strdup("Arial");
-    style->FontSize = 18;
-    style->PrimaryColour = 0xffffff00;
-    style->SecondaryColour = 0x00ffff00;
-    style->OutlineColour = 0x00000000;
-    style->BackColour = 0x00000080;
-    style->Bold = 200;
-    style->ScaleX = 1.0;
-    style->ScaleY = 1.0;
-    style->Spacing = 0;
-    style->BorderStyle = 1;
-    style->Outline = 2;
-    style->Shadow = 3;
-    style->Alignment = 2;
+    style->Name             = strdup("Default");
+    style->FontName         = strdup("Arial");
+    style->FontSize         = 18;
+    style->PrimaryColour    = 0xffffff00;
+    style->SecondaryColour  = 0x00ffff00;
+    style->OutlineColour    = 0x00000000;
+    style->BackColour       = 0x00000080;
+    style->Bold             = 200;
+    style->ScaleX           = 1.0;
+    style->ScaleY           = 1.0;
+    style->Spacing          = 0;
+    style->BorderStyle      = 1;
+    style->Outline          = 2;
+    style->Shadow           = 3;
+    style->Alignment        = 2;
     style->MarginL = style->MarginR = style->MarginV = 20;
 }
 
-static long long string2timecode(ASS_Library * library, char *p)
+static long long string2timecode(ASS_Library *library, char *p)
 {
     unsigned h, m, s, ms;
     long long tm;
@@ -284,7 +286,7 @@ static char *next_token(char **str)
  * \param str string to parse, zero-terminated
  * \param n_ignored number of format options to skip at the beginning
 */
-static int process_event_tail(ASS_Track * track, ASS_Event * event,
+static int process_event_tail(ASS_Track *track, ASS_Event *event,
                               char *str, int n_ignored)
 {
     char *token;
@@ -325,14 +327,19 @@ static int process_event_tail(ASS_Track * track, ASS_Event * event,
         NEXT(p, token);
 
         ALIAS(End, Duration)    // temporarily store end timecode in event->Duration
-    PARSE_START INTVAL(Layer)
+        PARSE_START
+            INTVAL(Layer)
             STYLEVAL(Style)
             STRVAL(Name)
             STRVAL(Effect)
             INTVAL(MarginL)
             INTVAL(MarginR)
             INTVAL(MarginV)
-            TIMEVAL(Start) TIMEVAL(Duration) PARSE_END} free(format);
+            TIMEVAL(Start)
+            TIMEVAL(Duration)
+        PARSE_END
+    }
+    free(format);
     return 1;
 }
 
@@ -341,7 +348,7 @@ static int process_event_tail(ASS_Track * track, ASS_Event * event,
  * \param track track to apply overrides to
  * The format for overrides is [StyleName.]Field=Value
  */
-void ass_process_force_style(ASS_Track * track)
+void ass_process_force_style(ASS_Track *track)
 {
     char **fs, *eq, *dt, *style, *tname, *token;
     ASS_Style *target;
@@ -386,7 +393,8 @@ void ass_process_force_style(ASS_Track * track)
             if (style == NULL
                 || strcasecmp(track->styles[sid].Name, style) == 0) {
                 target = track->styles + sid;
-            PARSE_START STRVAL(FontName)
+                PARSE_START
+                    STRVAL(FontName)
                     COLORVAL(PrimaryColour)
                     COLORVAL(SecondaryColour)
                     COLORVAL(OutlineColour)
@@ -406,8 +414,13 @@ void ass_process_force_style(ASS_Track * track)
                     INTVAL(Encoding)
                     FPVAL(ScaleX)
                     FPVAL(ScaleY)
-                    FPVAL(Outline) FPVAL(Shadow) FPVAL(Blur) PARSE_END}
-        } *eq = '=';
+                    FPVAL(Outline)
+                    FPVAL(Shadow)
+                    FPVAL(Blur)
+                PARSE_END
+            }
+        }
+        *eq = '=';
         if (dt)
             *dt = '.';
     }
@@ -419,7 +432,7 @@ void ass_process_force_style(ASS_Track * track)
  * \param str string to parse, zero-terminated
  * Allocates a new style struct.
 */
-static int process_style(ASS_Track * track, char *str)
+static int process_style(ASS_Track *track, char *str)
 {
 
     char *token;
@@ -474,19 +487,20 @@ static int process_style(ASS_Track * track, char *str)
         NEXT(q, tname);
         NEXT(p, token);
 
-        PARSE_START STARREDSTRVAL(Name)
-        if (strcmp(target->Name, "Default") == 0)
-            track->default_style = sid;
-        STRVAL(FontName)
+        PARSE_START
+            STARREDSTRVAL(Name)
+            if (strcmp(target->Name, "Default") == 0)
+                track->default_style = sid;
+            STRVAL(FontName)
             COLORVAL(PrimaryColour)
             COLORVAL(SecondaryColour)
-            COLORVAL(OutlineColour)     // TertiaryColor
+            COLORVAL(OutlineColour) // TertiaryColor
             COLORVAL(BackColour)
             // SSA uses BackColour for both outline and shadow
             // this will destroy SSA's TertiaryColour, but i'm not going to use it anyway
             if (track->track_type == TRACK_TYPE_SSA)
-            target->OutlineColour = target->BackColour;
-        FPVAL(FontSize)
+                target->OutlineColour = target->BackColour;
+            FPVAL(FontSize)
             INTVAL(Bold)
             INTVAL(Italic)
             INTVAL(Underline)
@@ -496,13 +510,13 @@ static int process_style(ASS_Track * track, char *str)
             INTVAL(BorderStyle)
             INTVAL(Alignment)
             if (track->track_type == TRACK_TYPE_ASS)
-            target->Alignment = numpad2align(target->Alignment);
-        // VSFilter compatibility
-        else if (target->Alignment == 8)
-            target->Alignment = 3;
-        else if (target->Alignment == 4)
-            target->Alignment = 11;
-        INTVAL(MarginL)
+                target->Alignment = numpad2align(target->Alignment);
+            // VSFilter compatibility
+            else if (target->Alignment == 8)
+                target->Alignment = 3;
+            else if (target->Alignment == 4)
+                target->Alignment = 11;
+            INTVAL(MarginL)
             INTVAL(MarginR)
             INTVAL(MarginV)
             INTVAL(Encoding)
@@ -510,16 +524,17 @@ static int process_style(ASS_Track * track, char *str)
             FPVAL(ScaleY)
             FPVAL(Outline)
             FPVAL(Shadow)
-    PARSE_END}
+        PARSE_END
+    }
     style->ScaleX = FFMAX(style->ScaleX, 0.) / 100.;
     style->ScaleY = FFMAX(style->ScaleY, 0.) / 100.;
     style->Spacing = FFMAX(style->Spacing, 0.);
     style->Outline = FFMAX(style->Outline, 0.);
     style->Shadow = FFMAX(style->Shadow, 0.);
-    style->Bold = ! !style->Bold;
-    style->Italic = ! !style->Italic;
-    style->Underline = ! !style->Underline;
-    style->StrikeOut = ! !style->StrikeOut;
+    style->Bold = !!style->Bold;
+    style->Italic = !!style->Italic;
+    style->Underline = !!style->Underline;
+    style->StrikeOut = !!style->StrikeOut;
     if (!style->Name)
         style->Name = strdup("Default");
     if (!style->FontName)
@@ -529,14 +544,14 @@ static int process_style(ASS_Track * track, char *str)
 
 }
 
-static int process_styles_line(ASS_Track * track, char *str)
+static int process_styles_line(ASS_Track *track, char *str)
 {
     if (!strncmp(str, "Format:", 7)) {
         char *p = str + 7;
         skip_spaces(&p);
         track->style_format = strdup(p);
         ass_msg(track->library, MSGL_DBG2, "Style format: %s",
-                track->style_format);
+               track->style_format);
     } else if (!strncmp(str, "Style:", 6)) {
         char *p = str + 6;
         skip_spaces(&p);
@@ -545,7 +560,7 @@ static int process_styles_line(ASS_Track * track, char *str)
     return 0;
 }
 
-static int process_info_line(ASS_Track * track, char *str)
+static int process_info_line(ASS_Track *track, char *str)
 {
     if (!strncmp(str, "PlayResX:", 9)) {
         track->PlayResX = atoi(str + 9);
@@ -563,35 +578,33 @@ static int process_info_line(ASS_Track * track, char *str)
         track->YCbCrMatrix = parse_ycbcr_matrix(str + 13);
     } else if (!strncmp(str, "Language:", 9)) {
         char *p = str + 9;
-        while (*p && isspace(*p))
-            p++;
+        while (*p && isspace(*p)) p++;
         track->Language = strndup(p, 2);
     }
     return 0;
 }
 
-static void event_format_fallback(ASS_Track * track)
+static void event_format_fallback(ASS_Track *track)
 {
     track->parser_priv->state = PST_EVENTS;
     if (track->track_type == TRACK_TYPE_SSA)
         track->event_format = strdup("Marked, Start, End, Style, "
-                                     "Name, MarginL, MarginR, MarginV, Effect, Text");
+            "Name, MarginL, MarginR, MarginV, Effect, Text");
     else
         track->event_format = strdup("Layer, Start, End, Style, "
-                                     "Actor, MarginL, MarginR, MarginV, Effect, Text");
+            "Actor, MarginL, MarginR, MarginV, Effect, Text");
     ass_msg(track->library, MSGL_V,
             "No event format found, using fallback");
 }
 
-static int process_events_line(ASS_Track * track, char *str)
+static int process_events_line(ASS_Track *track, char *str)
 {
     if (!strncmp(str, "Format:", 7)) {
         char *p = str + 7;
         skip_spaces(&p);
         free(track->event_format);
         track->event_format = strdup(p);
-        ass_msg(track->library, MSGL_DBG2, "Event format: %s",
-                track->event_format);
+        ass_msg(track->library, MSGL_DBG2, "Event format: %s", track->event_format);
     } else if (!strncmp(str, "Dialogue:", 9)) {
         // This should never be reached for embedded subtitles.
         // They have slightly different format and are parsed in ass_process_chunk,
@@ -637,7 +650,7 @@ static unsigned char *decode_chars(unsigned char c1, unsigned char c2,
     return dst;
 }
 
-static int decode_font(ASS_Track * track)
+static int decode_font(ASS_Track *track)
 {
     unsigned char *p;
     unsigned char *q;
@@ -674,7 +687,7 @@ static int decode_font(ASS_Track * track)
                      (char *) buf, dsize);
     }
 
-  error_decode_font:
+error_decode_font:
     free(buf);
     free(track->parser_priv->fontname);
     free(track->parser_priv->fontdata);
@@ -685,7 +698,7 @@ static int decode_font(ASS_Track * track)
     return 0;
 }
 
-static int process_fonts_line(ASS_Track * track, char *str)
+static int process_fonts_line(ASS_Track *track, char *str)
 {
     int len;
 
@@ -697,7 +710,7 @@ static int process_fonts_line(ASS_Track * track, char *str)
         }
         track->parser_priv->fontname = strdup(p);
         ass_msg(track->library, MSGL_V, "Fontname: %s",
-                track->parser_priv->fontname);
+               track->parser_priv->fontname);
         return 0;
     }
 
@@ -731,7 +744,7 @@ static int process_fonts_line(ASS_Track * track, char *str)
  * \param track track
  * \param str string to parse, zero-terminated
 */
-static int process_line(ASS_Track * track, char *str)
+static int process_line(ASS_Track *track, char *str)
 {
     if (!strncasecmp(str, "[Script Info]", 13)) {
         track->parser_priv->state = PST_INFO;
@@ -766,7 +779,7 @@ static int process_line(ASS_Track * track, char *str)
     return 0;
 }
 
-static int process_text(ASS_Track * track, char *str)
+static int process_text(ASS_Track *track, char *str)
 {
     char *p = str;
     while (1) {
@@ -802,7 +815,7 @@ static int process_text(ASS_Track * track, char *str)
  * \param data string to parse
  * \param size length of data
 */
-void ass_process_data(ASS_Track * track, char *data, int size)
+void ass_process_data(ASS_Track *track, char *data, int size)
 {
     char *str = malloc(size + 1);
     if (!str)
@@ -823,7 +836,7 @@ void ass_process_data(ASS_Track * track, char *data, int size)
  * \param size length of data
  CodecPrivate section contains [Stream Info] and [V4+ Styles] ([V4 Styles] for SSA) sections
 */
-void ass_process_codec_private(ASS_Track * track, char *data, int size)
+void ass_process_codec_private(ASS_Track *track, char *data, int size)
 {
     ass_process_data(track, data, size);
 
@@ -835,7 +848,7 @@ void ass_process_codec_private(ASS_Track * track, char *data, int size)
     ass_process_force_style(track);
 }
 
-static int check_duplicate_event(ASS_Track * track, int ReadOrder)
+static int check_duplicate_event(ASS_Track *track, int ReadOrder)
 {
     int i;
     for (i = 0; i < track->n_events - 1; ++i)   // ignoring last event, it is the one we are comparing with
@@ -852,7 +865,7 @@ static int check_duplicate_event(ASS_Track * track, int ReadOrder)
  * \param timecode starting time of the event (milliseconds)
  * \param duration duration of the event (milliseconds)
 */
-void ass_process_chunk(ASS_Track * track, char *data, int size,
+void ass_process_chunk(ASS_Track *track, char *data, int size,
                        long long timecode, long long duration)
 {
     char *str;
@@ -871,9 +884,8 @@ void ass_process_chunk(ASS_Track * track, char *data, int size,
         return;
     memcpy(str, data, size);
     str[size] = '\0';
-    ass_msg(track->library, MSGL_V,
-            "Event at %" PRId64 ", +%" PRId64 ": %s", (int64_t) timecode,
-            (int64_t) duration, str);
+    ass_msg(track->library, MSGL_V, "Event at %" PRId64 ", +%" PRId64 ": %s",
+           (int64_t) timecode, (int64_t) duration, str);
 
     eid = ass_alloc_event(track);
     event = track->events + eid;
@@ -908,7 +920,7 @@ void ass_process_chunk(ASS_Track * track, char *data, int size,
  * \brief Flush buffered events.
  * \param track track
 */
-void ass_flush_events(ASS_Track * track)
+void ass_flush_events(ASS_Track *track)
 {
     if (track->events) {
         int eid;
@@ -925,7 +937,7 @@ void ass_flush_events(ASS_Track * track)
  * \param size buffer size
  * \return a pointer to recoded buffer, caller is responsible for freeing it
 **/
-static char *sub_recode(ASS_Library * library, char *data, size_t size,
+static char *sub_recode(ASS_Library *library, char *data, size_t size,
                         char *codepage)
 {
     iconv_t icdsc;
@@ -951,7 +963,7 @@ static char *sub_recode(ASS_Library * library, char *data, size_t size,
             ass_msg(library, MSGL_ERR, "Error opening iconv descriptor");
 #ifdef CONFIG_ENCA
         if (cp_tmp != codepage) {
-            free((void *) cp_tmp);
+            free((void*)cp_tmp);
         }
 #endif
     }
@@ -1006,7 +1018,7 @@ static char *sub_recode(ASS_Library * library, char *data, size_t size,
         outbuf[osize - oleft - 1] = 0;
     }
 
-  out:
+out:
     if (icdsc != (iconv_t) (-1)) {
         (void) iconv_close(icdsc);
         icdsc = (iconv_t) (-1);
@@ -1023,7 +1035,7 @@ static char *sub_recode(ASS_Library * library, char *data, size_t size,
  * \param bufsize out: file size
  * \return pointer to file contents. Caller is responsible for its deallocation.
  */
-static char *read_file(ASS_Library * library, char *fname, size_t * bufsize)
+static char *read_file(ASS_Library *library, char *fname, size_t *bufsize)
 {
     int res;
     long sz;
@@ -1078,7 +1090,7 @@ static char *read_file(ASS_Library * library, char *fname, size_t * bufsize)
 /*
  * \param buf pointer to subtitle text in utf-8
  */
-static ASS_Track *parse_memory(ASS_Library * library, char *buf)
+static ASS_Track *parse_memory(ASS_Library *library, char *buf)
 {
     ASS_Track *track;
     int i;
@@ -1110,7 +1122,7 @@ static ASS_Track *parse_memory(ASS_Library * library, char *buf)
  * \param codepage recode buffer contents from given codepage
  * \return newly allocated track
 */
-ASS_Track *ass_read_memory(ASS_Library * library, char *buf,
+ASS_Track *ass_read_memory(ASS_Library *library, char *buf,
                            size_t bufsize, char *codepage)
 {
     ASS_Track *track;
@@ -1147,8 +1159,8 @@ ASS_Track *ass_read_memory(ASS_Library * library, char *buf,
     return track;
 }
 
-static char *read_file_recode(ASS_Library * library, char *fname,
-                              char *codepage, size_t * size)
+static char *read_file_recode(ASS_Library *library, char *fname,
+                              char *codepage, size_t *size)
 {
     char *buf;
     size_t bufsize;
@@ -1176,7 +1188,8 @@ static char *read_file_recode(ASS_Library * library, char *fname,
  * \param codepage recode buffer contents from given codepage
  * \return newly allocated track
 */
-ASS_Track *ass_read_file(ASS_Library * library, char *fname, char *codepage)
+ASS_Track *ass_read_file(ASS_Library *library, char *fname,
+                         char *codepage)
 {
     char *buf;
     ASS_Track *track;
@@ -1202,7 +1215,7 @@ ASS_Track *ass_read_file(ASS_Library * library, char *fname, char *codepage)
 /**
  * \brief read styles from file into already initialized track
  */
-int ass_read_styles(ASS_Track * track, char *fname, char *codepage)
+int ass_read_styles(ASS_Track *track, char *fname, char *codepage)
 {
     char *buf;
     ParserState old_state;
@@ -1230,7 +1243,7 @@ int ass_read_styles(ASS_Track * track, char *fname, char *codepage)
     return 0;
 }
 
-long long ass_step_sub(ASS_Track * track, long long now, int movement)
+long long ass_step_sub(ASS_Track *track, long long now, int movement)
 {
     int i;
     ASS_Event *best = NULL;
@@ -1274,7 +1287,7 @@ long long ass_step_sub(ASS_Track * track, long long now, int movement)
     return best ? best->Start - now : 0;
 }
 
-ASS_Track *ass_new_track(ASS_Library * library)
+ASS_Track *ass_new_track(ASS_Library *library)
 {
     ASS_Track *track = calloc(1, sizeof(ASS_Track));
     if (!track)
@@ -1292,32 +1305,32 @@ ASS_Track *ass_new_track(ASS_Library * library)
 /**
  * \brief Prepare track for rendering
  */
-void ass_lazy_track_init(ASS_Library * lib, ASS_Track * track)
+void ass_lazy_track_init(ASS_Library *lib, ASS_Track *track)
 {
     if (track->PlayResX && track->PlayResY)
         return;
     if (!track->PlayResX && !track->PlayResY) {
         ass_msg(lib, MSGL_WARN,
-                "Neither PlayResX nor PlayResY defined. Assuming 384x288");
+               "Neither PlayResX nor PlayResY defined. Assuming 384x288");
         track->PlayResX = 384;
         track->PlayResY = 288;
     } else {
         if (!track->PlayResY && track->PlayResX == 1280) {
             track->PlayResY = 1024;
             ass_msg(lib, MSGL_WARN,
-                    "PlayResY undefined, setting to %d", track->PlayResY);
+                   "PlayResY undefined, setting to %d", track->PlayResY);
         } else if (!track->PlayResY) {
             track->PlayResY = track->PlayResX * 3 / 4;
             ass_msg(lib, MSGL_WARN,
-                    "PlayResY undefined, setting to %d", track->PlayResY);
+                   "PlayResY undefined, setting to %d", track->PlayResY);
         } else if (!track->PlayResX && track->PlayResY == 1024) {
             track->PlayResX = 1280;
             ass_msg(lib, MSGL_WARN,
-                    "PlayResX undefined, setting to %d", track->PlayResX);
+                   "PlayResX undefined, setting to %d", track->PlayResX);
         } else if (!track->PlayResX) {
             track->PlayResX = track->PlayResY * 4 / 3;
             ass_msg(lib, MSGL_WARN,
-                    "PlayResX undefined, setting to %d", track->PlayResX);
+                   "PlayResX undefined, setting to %d", track->PlayResX);
         }
     }
 }

@@ -39,24 +39,24 @@ extern "C" {
  * The last bitmap row is not guaranteed to be padded up to stride size,
  * e.g. in the worst case a bitmap has the size stride * (h - 1) + w.
  */
-    typedef struct ass_image {
-        int w, h;               // Bitmap width/height
-        int stride;             // Bitmap stride
-        unsigned char *bitmap;  // 1bpp stride*h alpha buffer
-        // Note: the last row may not be padded to
-        // bitmap stride!
-        uint32_t color;         // Bitmap color and alpha, RGBA
-        int dst_x, dst_y;       // Bitmap placement inside the video frame
+typedef struct ass_image {
+    int w, h;                   // Bitmap width/height
+    int stride;                 // Bitmap stride
+    unsigned char *bitmap;      // 1bpp stride*h alpha buffer
+                                // Note: the last row may not be padded to
+                                // bitmap stride!
+    uint32_t color;             // Bitmap color and alpha, RGBA
+    int dst_x, dst_y;           // Bitmap placement inside the video frame
 
-        struct ass_image *next; // Next image, or NULL
+    struct ass_image *next;   // Next image, or NULL
 
-        enum {
-            IMAGE_TYPE_CHARACTER,
-            IMAGE_TYPE_OUTLINE,
-            IMAGE_TYPE_SHADOW
-        } type;
+    enum {
+        IMAGE_TYPE_CHARACTER,
+        IMAGE_TYPE_OUTLINE,
+        IMAGE_TYPE_SHADOW
+    } type;
 
-    } ASS_Image;
+} ASS_Image;
 
 /*
  * Hinting type. (see ass_set_hinting below)
@@ -72,12 +72,12 @@ extern "C" {
  * to use the light autohinter, ASS_HINTING_LIGHT, instead.  For best
  * compatibility with problematic fonts, disable hinting.
  */
-    typedef enum {
-        ASS_HINTING_NONE = 0,
-        ASS_HINTING_LIGHT,
-        ASS_HINTING_NORMAL,
-        ASS_HINTING_NATIVE
-    } ASS_Hinting;
+typedef enum {
+    ASS_HINTING_NONE = 0,
+    ASS_HINTING_LIGHT,
+    ASS_HINTING_NORMAL,
+    ASS_HINTING_NATIVE
+} ASS_Hinting;
 
 /**
  * \brief Text shaping levels.
@@ -87,23 +87,23 @@ extern "C" {
  *
  * libass uses the best shaper available by default.
  */
-    typedef enum {
-        ASS_SHAPING_SIMPLE = 0,
-        ASS_SHAPING_COMPLEX
-    } ASS_ShapingLevel;
+typedef enum {
+    ASS_SHAPING_SIMPLE = 0,
+    ASS_SHAPING_COMPLEX
+} ASS_ShapingLevel;
 
 /**
  * \brief Style override options. See
  * ass_set_selective_style_override_enabled() for details.
  */
-    typedef enum {
+typedef enum {
     /**
      * Default mode (with no other bits set). All selective override features
      * as well as the style set with ass_set_selective_style_override() are
      * disabled, but traditional overrides like ass_set_font_scale() are
      * applied unconditionally.
      */
-        ASS_OVERRIDE_DEFAULT = 0,
+    ASS_OVERRIDE_DEFAULT = 0,
     /**
      * Apply the style as set with ass_set_selective_style_override() on events
      * which look like dialogue. Other style overrides are also applied this
@@ -118,45 +118,45 @@ extern "C" {
      * ASS_OVERRIDE_BIT_BORDER
      * ASS_OVERRIDE_BIT_ATTRIBUTES
      */
-        ASS_OVERRIDE_BIT_STYLE = 1 << 0,
+    ASS_OVERRIDE_BIT_STYLE = 1 << 0,
     /**
      * Apply ass_set_font_scale() only on events which look like dialogue.
      * If not set, the font scale is applied to all events. (The behavior and
      * name of this flag are unintuitive, but exist for compatibility)
      */
-        ASS_OVERRIDE_BIT_SELECTIVE_FONT_SCALE = 1 << 1,
+    ASS_OVERRIDE_BIT_SELECTIVE_FONT_SCALE = 1 << 1,
     /**
      * Old alias for ASS_OVERRIDE_BIT_SELECTIVE_FONT_SCALE. Deprecated. Do not use.
      */
-        ASS_OVERRIDE_BIT_FONT_SIZE = 1 << 1,
+    ASS_OVERRIDE_BIT_FONT_SIZE = 1 << 1,
     /**
      * On dialogue events override: FontSize, Spacing, Blur, ScaleX, ScaleY
      */
-        ASS_OVERRIDE_BIT_FONT_SIZE_FIELDS = 1 << 2,
+    ASS_OVERRIDE_BIT_FONT_SIZE_FIELDS = 1 << 2,
     /**
      * On dialogue events override: FontName, treat_fontname_as_pattern
      */
-        ASS_OVERRIDE_BIT_FONT_NAME = 1 << 3,
+    ASS_OVERRIDE_BIT_FONT_NAME = 1 << 3,
     /**
      * On dialogue events override: PrimaryColour, SecondaryColour, OutlineColour, BackColour
      */
-        ASS_OVERRIDE_BIT_COLORS = 1 << 4,
+    ASS_OVERRIDE_BIT_COLORS = 1 << 4,
     /**
      * On dialogue events override: Bold, Italic, Underline, StrikeOut
      */
-        ASS_OVERRIDE_BIT_ATTRIBUTES = 1 << 5,
+    ASS_OVERRIDE_BIT_ATTRIBUTES = 1 << 5,
     /**
      * On dialogue events override: BorderStyle, Outline, Shadow
      */
-        ASS_OVERRIDE_BIT_BORDER = 1 << 6,
+    ASS_OVERRIDE_BIT_BORDER = 1 << 6,
     /**
      * On dialogue events override: Alignment
      */
-        ASS_OVERRIDE_BIT_ALIGNMENT = 1 << 7,
+    ASS_OVERRIDE_BIT_ALIGNMENT = 1 << 7,
     /**
      * On dialogue events override: MarginL, MarginR, MarginV
      */
-        ASS_OVERRIDE_BIT_MARGINS = 1 << 8,
+    ASS_OVERRIDE_BIT_MARGINS = 1 << 8,
     /**
      * Unconditionally replace all fields of all styles with the one provided
      * with ass_set_selective_style_override().
@@ -165,15 +165,15 @@ extern "C" {
      * you want FontSize, Spacing, Outline, Shadow to be scaled to the script
      * resolution given by the ASS_Track.
      */
-        ASS_OVERRIDE_FULL_STYLE = 1 << 9,
-    } ASS_OverrideBits;
+    ASS_OVERRIDE_FULL_STYLE = 1 << 9,
+} ASS_OverrideBits;
 
 /**
  * \brief Return the version of library. This returns the value LIBASS_VERSION
  * was set to when the library was compiled.
  * \return library version
  */
-    int ass_library_version(void);
+int ass_library_version(void);
 
 /**
  * \brief Default Font provider to load fonts in libass' database
@@ -185,25 +185,25 @@ extern "C" {
  *
  * libass uses the best shaper available by default.
  */
-    typedef enum {
-        ASS_FONTPROVIDER_NONE = 0,
-        ASS_FONTPROVIDER_AUTODETECT = 1,
-        ASS_FONTPROVIDER_CORETEXT,
-        ASS_FONTPROVIDER_FONTCONFIG,
-        ASS_FONTPROVIDER_DIRECTWRITE,
-    } ASS_DefaultFontProvider;
+typedef enum {
+    ASS_FONTPROVIDER_NONE       = 0,
+    ASS_FONTPROVIDER_AUTODETECT = 1,
+    ASS_FONTPROVIDER_CORETEXT,
+    ASS_FONTPROVIDER_FONTCONFIG,
+    ASS_FONTPROVIDER_DIRECTWRITE,
+} ASS_DefaultFontProvider;
 
 /**
  * \brief Initialize the library.
  * \return library handle or NULL if failed
  */
-    ASS_Library *ass_library_init(void);
+ASS_Library *ass_library_init(void);
 
 /**
  * \brief Finalize the library
  * \param priv library handle
  */
-    void ass_library_done(ASS_Library * priv);
+void ass_library_done(ASS_Library *priv);
 
 /**
  * \brief Set additional fonts directory.
@@ -214,14 +214,14 @@ extern "C" {
  * \param priv library handle
  * \param fonts_dir directory with additional fonts
  */
-    void ass_set_fonts_dir(ASS_Library * priv, const char *fonts_dir);
+void ass_set_fonts_dir(ASS_Library *priv, const char *fonts_dir);
 
 /**
  * \brief Whether fonts should be extracted from track data.
  * \param priv library handle
  * \param extract whether to extract fonts
  */
-    void ass_set_extract_fonts(ASS_Library * priv, int extract);
+void ass_set_extract_fonts(ASS_Library *priv, int extract);
 
 /**
  * \brief Register style overrides with a library instance.
@@ -232,13 +232,13 @@ extern "C" {
  * \param priv library handle
  * \param list NULL-terminated list of strings
  */
-    void ass_set_style_overrides(ASS_Library * priv, char **list);
+void ass_set_style_overrides(ASS_Library *priv, char **list);
 
 /**
  * \brief Explicitly process style overrides for a track.
  * \param track track handle
  */
-    void ass_process_force_style(ASS_Track * track);
+void ass_process_force_style(ASS_Track *track);
 
 /**
  * \brief Register a callback for debug/info messages.
@@ -254,22 +254,22 @@ extern "C" {
  * \param msg_cb pointer to callback function
  * \param data additional data, will be passed to callback
  */
-    void ass_set_message_cb(ASS_Library * priv, void (*msg_cb)
-                             (int level, const char *fmt, va_list args,
-                              void *data), void *data);
+void ass_set_message_cb(ASS_Library *priv, void (*msg_cb)
+                        (int level, const char *fmt, va_list args, void *data),
+                        void *data);
 
 /**
  * \brief Initialize the renderer.
  * \param priv library handle
  * \return renderer handle or NULL if failed
  */
-    ASS_Renderer *ass_renderer_init(ASS_Library *);
+ASS_Renderer *ass_renderer_init(ASS_Library *);
 
 /**
  * \brief Finalize the renderer.
  * \param priv renderer handle
  */
-    void ass_renderer_done(ASS_Renderer * priv);
+void ass_renderer_done(ASS_Renderer *priv);
 
 /**
  * \brief Set the frame size in pixels, including margins.
@@ -283,7 +283,7 @@ extern "C" {
  * \param w width
  * \param h height
  */
-    void ass_set_frame_size(ASS_Renderer * priv, int w, int h);
+void ass_set_frame_size(ASS_Renderer *priv, int w, int h);
 
 /**
  * \brief Set the source image size in pixels.
@@ -296,14 +296,14 @@ extern "C" {
  * \param w width
  * \param h height
  */
-    void ass_set_storage_size(ASS_Renderer * priv, int w, int h);
+void ass_set_storage_size(ASS_Renderer *priv, int w, int h);
 
 /**
  * \brief Set shaping level. This is merely a hint, the renderer will use
  * whatever is available if the request cannot be fulfilled.
  * \param level shaping level
  */
-    void ass_set_shaper(ASS_Renderer * priv, ASS_ShapingLevel level);
+void ass_set_shaper(ASS_Renderer *priv, ASS_ShapingLevel level);
 
 /**
  * \brief Set frame margins.  These values may be negative if pan-and-scan
@@ -333,14 +333,14 @@ extern "C" {
  * \param l left margin
  * \param r right margin
  */
-    void ass_set_margins(ASS_Renderer * priv, int t, int b, int l, int r);
+void ass_set_margins(ASS_Renderer *priv, int t, int b, int l, int r);
 
 /**
  * \brief Whether margins should be used for placing regular events.
  * \param priv renderer handle
  * \param use whether to use the margins
  */
-    void ass_set_use_margins(ASS_Renderer * priv, int use);
+void ass_set_use_margins(ASS_Renderer *priv, int use);
 
 /**
  * \brief Set pixel aspect ratio correction.
@@ -360,7 +360,7 @@ extern "C" {
  * \param priv renderer handle
  * \param par pixel aspect ratio (1.0 means square pixels, 0 means default)
  */
-    void ass_set_pixel_aspect(ASS_Renderer * priv, double par);
+void ass_set_pixel_aspect(ASS_Renderer *priv, double par);
 
 /**
  * \brief Set aspect ratio parameters.
@@ -370,28 +370,28 @@ extern "C" {
  * \param dar display aspect ratio (DAR), prescaled for output PAR
  * \param sar storage aspect ratio (SAR)
  */
-    void ass_set_aspect_ratio(ASS_Renderer * priv, double dar, double sar);
+void ass_set_aspect_ratio(ASS_Renderer *priv, double dar, double sar);
 
 /**
  * \brief Set a fixed font scaling factor.
  * \param priv renderer handle
  * \param font_scale scaling factor, default is 1.0
  */
-    void ass_set_font_scale(ASS_Renderer * priv, double font_scale);
+void ass_set_font_scale(ASS_Renderer *priv, double font_scale);
 
 /**
  * \brief Set font hinting method.
  * \param priv renderer handle
  * \param ht hinting method
  */
-    void ass_set_hinting(ASS_Renderer * priv, ASS_Hinting ht);
+void ass_set_hinting(ASS_Renderer *priv, ASS_Hinting ht);
 
 /**
  * \brief Set line spacing. Will not be scaled with frame size.
  * \param priv renderer handle
  * \param line_spacing line spacing in pixels
  */
-    void ass_set_line_spacing(ASS_Renderer * priv, double line_spacing);
+void ass_set_line_spacing(ASS_Renderer *priv, double line_spacing);
 
 /**
  * \brief Set vertical line position.
@@ -399,15 +399,15 @@ extern "C" {
  * \param line_position vertical line position of subtitles in percent
  * (0-100: 0 = on the bottom (default), 100 = on top)
  */
-    void ass_set_line_position(ASS_Renderer * priv, double line_position);
+void ass_set_line_position(ASS_Renderer *priv, double line_position);
 
 /**
  * \brief Get the list of available font providers.
  * \return list of available font providers (user owns the returned array)
  */
-    void ass_get_available_font_providers(ASS_Library * priv,
-                                          ASS_DefaultFontProvider **
-                                          providers, size_t * size);
+void ass_get_available_font_providers(ASS_Library *priv,
+                                      ASS_DefaultFontProvider **providers,
+                                      size_t *size);
 
 /**
  * \brief Set font lookup defaults.
@@ -422,10 +422,9 @@ extern "C" {
  *
  * NOTE: font lookup must be configured before an ASS_Renderer can be used.
  */
-    void ass_set_fonts(ASS_Renderer * priv, const char *default_font,
-                       const char *default_family,
-                       ASS_DefaultFontProvider dfp, const char *config,
-                       int update);
+void ass_set_fonts(ASS_Renderer *priv, const char *default_font,
+                   const char *default_family, ASS_DefaultFontProvider dfp,
+                   const char *config, int update);
 
 /**
  * \brief Set selective style override mode.
@@ -442,8 +441,7 @@ extern "C" {
  * \param priv renderer handle
  * \param bits bit mask comprised of ASS_OverrideBits values.
  */
-    void ass_set_selective_style_override_enabled(ASS_Renderer * priv,
-                                                  int bits);
+void ass_set_selective_style_override_enabled(ASS_Renderer *priv, int bits);
 
 /**
  * \brief Set style for selective style override.
@@ -452,8 +450,7 @@ extern "C" {
  * should initialize it with {0} before setting fields. Strings will be copied
  * by the function.
  */
-    void ass_set_selective_style_override(ASS_Renderer * priv,
-                                          ASS_Style * style);
+void ass_set_selective_style_override(ASS_Renderer *priv, ASS_Style *style);
 
 /**
  * \brief Update/build font cache.  This needs to be called if it was
@@ -462,7 +459,7 @@ extern "C" {
  * \param priv renderer handle
  * \return success
  */
-    int ass_fonts_update(ASS_Renderer * priv);
+int ass_fonts_update(ASS_Renderer *priv);
 
 /**
  * \brief Create an empty font provider. A font provider can be used to
@@ -472,9 +469,9 @@ extern "C" {
  * \param private data for provider callbacks
  *
  */
-    ASS_FontProvider *ass_create_font_provider(ASS_Renderer * priv,
-                                               ASS_FontProviderFuncs *
-                                               funcs, void *data);
+ASS_FontProvider *
+ass_create_font_provider(ASS_Renderer *priv, ASS_FontProviderFuncs *funcs,
+                         void *data);
 
 /**
  * \brief Add a font to a font provider.
@@ -487,18 +484,17 @@ extern "C" {
  * \return success
  *
  */
-    int
-     ass_font_provider_add_font(ASS_FontProvider * provider,
-                                ASS_FontProviderMetaData * meta,
-                                const char *path, unsigned int index,
-                                const char *psname, void *data);
+int
+ass_font_provider_add_font(ASS_FontProvider *provider,
+                           ASS_FontProviderMetaData *meta, const char *path,
+                           unsigned int index, const char *psname, void *data);
 
 /**
  * \brief Free font provider and associated fonts.
  * \param provider the font provider
  *
  */
-    void ass_font_provider_free(ASS_FontProvider * provider);
+void ass_font_provider_free(ASS_FontProvider *provider);
 
 /**
  * \brief Set hard cache limits.  Do not set, or set to zero, for reasonable
@@ -508,8 +504,8 @@ extern "C" {
  * \param glyph_max maximum number of cached glyphs
  * \param bitmap_max_size maximum bitmap cache size (in MB)
  */
-    void ass_set_cache_limits(ASS_Renderer * priv, int glyph_max,
-                              int bitmap_max_size);
+void ass_set_cache_limits(ASS_Renderer *priv, int glyph_max,
+                          int bitmap_max_size);
 
 /**
  * \brief Render a frame, producing a list of ASS_Image.
@@ -519,8 +515,8 @@ extern "C" {
  * \param detect_change compare to the previous call and set to 1
  * if positions changed, or set to 2 if content changed.
  */
-    ASS_Image *ass_render_frame(ASS_Renderer * priv, ASS_Track * track,
-                                long long now, int *detect_change);
+ASS_Image *ass_render_frame(ASS_Renderer *priv, ASS_Track *track,
+                            long long now, int *detect_change);
 
 
 /*
@@ -533,27 +529,27 @@ extern "C" {
  * \param library handle
  * \return pointer to empty track
  */
-    ASS_Track *ass_new_track(ASS_Library *);
+ASS_Track *ass_new_track(ASS_Library *);
 
 /**
  * \brief Deallocate track and all its child objects (styles and events).
  * \param track track to deallocate
  */
-    void ass_free_track(ASS_Track * track);
+void ass_free_track(ASS_Track *track);
 
 /**
  * \brief Allocate new style.
  * \param track track
  * \return newly allocated style id
  */
-    int ass_alloc_style(ASS_Track * track);
+int ass_alloc_style(ASS_Track *track);
 
 /**
  * \brief Allocate new event.
  * \param track track
  * \return newly allocated event id
  */
-    int ass_alloc_event(ASS_Track * track);
+int ass_alloc_event(ASS_Track *track);
 
 /**
  * \brief Delete a style.
@@ -561,7 +557,7 @@ extern "C" {
  * \param sid style id
  * Deallocates style data. Does not modify track->n_styles.
  */
-    void ass_free_style(ASS_Track * track, int sid);
+void ass_free_style(ASS_Track *track, int sid);
 
 /**
  * \brief Delete an event.
@@ -569,7 +565,7 @@ extern "C" {
  * \param eid event id
  * Deallocates event data. Does not modify track->n_events.
  */
-    void ass_free_event(ASS_Track * track, int eid);
+void ass_free_event(ASS_Track *track, int eid);
 
 /**
  * \brief Parse a chunk of subtitle stream data.
@@ -577,7 +573,7 @@ extern "C" {
  * \param data string to parse
  * \param size length of data
  */
-    void ass_process_data(ASS_Track * track, char *data, int size);
+void ass_process_data(ASS_Track *track, char *data, int size);
 
 /**
  * \brief Parse Codec Private section of the subtitle stream, in Matroska
@@ -586,7 +582,7 @@ extern "C" {
  * \param data string to parse
  * \param size length of data
  */
-    void ass_process_codec_private(ASS_Track * track, char *data, int size);
+void ass_process_codec_private(ASS_Track *track, char *data, int size);
 
 /**
  * \brief Parse a chunk of subtitle stream data. A chunk contains exactly one
@@ -597,14 +593,14 @@ extern "C" {
  * \param timecode starting time of the event (milliseconds)
  * \param duration duration of the event (milliseconds)
  */
-    void ass_process_chunk(ASS_Track * track, char *data, int size,
-                           long long timecode, long long duration);
+void ass_process_chunk(ASS_Track *track, char *data, int size,
+                       long long timecode, long long duration);
 
 /**
  * \brief Flush buffered events.
  * \param track track
 */
-    void ass_flush_events(ASS_Track * track);
+void ass_flush_events(ASS_Track *track);
 
 /**
  * \brief Read subtitles from file.
@@ -613,8 +609,8 @@ extern "C" {
  * \param codepage encoding (iconv format)
  * \return newly allocated track
 */
-    ASS_Track *ass_read_file(ASS_Library * library, char *fname,
-                             char *codepage);
+ASS_Track *ass_read_file(ASS_Library *library, char *fname,
+                         char *codepage);
 
 /**
  * \brief Read subtitles from memory.
@@ -624,15 +620,15 @@ extern "C" {
  * \param codepage encoding (iconv format)
  * \return newly allocated track
 */
-    ASS_Track *ass_read_memory(ASS_Library * library, char *buf,
-                               size_t bufsize, char *codepage);
+ASS_Track *ass_read_memory(ASS_Library *library, char *buf,
+                           size_t bufsize, char *codepage);
 /**
  * \brief Read styles from file into already initialized track.
  * \param fname file name
  * \param codepage encoding (iconv format)
  * \return 0 on success
  */
-    int ass_read_styles(ASS_Track * track, char *fname, char *codepage);
+int ass_read_styles(ASS_Track *track, char *fname, char *codepage);
 
 /**
  * \brief Add a memory font.
@@ -641,14 +637,14 @@ extern "C" {
  * \param data binary font data
  * \param data_size data size
 */
-    void ass_add_font(ASS_Library * library, char *name, char *data,
-                      int data_size);
+void ass_add_font(ASS_Library *library, char *name, char *data,
+                  int data_size);
 
 /**
  * \brief Remove all fonts stored in an ass_library object.
  * \param library library handle
  */
-    void ass_clear_fonts(ASS_Library * library);
+void ass_clear_fonts(ASS_Library *library);
 
 /**
  * \brief Calculates timeshift from now to the start of some other subtitle
@@ -659,9 +655,10 @@ extern "C" {
  * +2 means "the one after the next", -1 means "previous"
  * \return timeshift in milliseconds
  */
-    long long ass_step_sub(ASS_Track * track, long long now, int movement);
+long long ass_step_sub(ASS_Track *track, long long now, int movement);
 
 #ifdef __cplusplus
 }
 #endif
-#endif                          /* LIBASS_ASS_H */
+
+#endif /* LIBASS_ASS_H */

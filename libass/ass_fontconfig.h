@@ -26,9 +26,9 @@
 
 #ifdef CONFIG_FONTCONFIG
 
-ASS_FontProvider *ass_fontconfig_add_provider(ASS_Library * lib,
-                                              ASS_FontSelector * selector,
-                                              const char *config);
+ASS_FontProvider *
+ass_fontconfig_add_provider(ASS_Library *lib, ASS_FontSelector *selector,
+                            const char *config);
 
 #endif
 

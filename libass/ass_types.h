@@ -49,19 +49,20 @@ typedef struct font_provider ASS_FontProvider;
 
 
 /* Font Provider */
-typedef size_t(*GetDataFunc) (void *, unsigned char *, size_t, size_t);
-typedef int (*CheckGlyphFunc) (void *, uint32_t);
-typedef void (*DestroyFontFunc) (void *);
-typedef void (*DestroyProviderFunc) (void *);
-typedef void (*MatchFontsFunc) (ASS_Library * lib,
-                                ASS_FontProvider * provider, char *name);
+typedef size_t  (*GetDataFunc)(void *, unsigned char*, size_t, size_t);
+typedef int     (*CheckGlyphFunc)(void *, uint32_t);
+typedef void    (*DestroyFontFunc)(void *);
+typedef void    (*DestroyProviderFunc)(void *);
+typedef void    (*MatchFontsFunc)(ASS_Library *lib,
+                                  ASS_FontProvider *provider,
+                                  char *name);
 
 typedef struct font_provider_funcs {
-    GetDataFunc get_data;       // callback for memory fonts
-    CheckGlyphFunc check_glyph; // test codepoint for coverage
-    DestroyFontFunc destroy_font;       // destroy a single font
-    DestroyProviderFunc destroy_provider;       // destroy provider only
-    MatchFontsFunc match_fonts; // match fonts against some name
+    GetDataFunc     get_data;       // callback for memory fonts
+    CheckGlyphFunc  check_glyph;    // test codepoint for coverage
+    DestroyFontFunc destroy_font;   // destroy a single font
+    DestroyProviderFunc destroy_provider;   // destroy provider only
+    MatchFontsFunc  match_fonts;    // match fonts against some name
     // XXX: add function for alias handling
 } ASS_FontProviderFuncs;
 
@@ -70,13 +71,13 @@ typedef struct font_provider_funcs {
  * At minimum `family' is required.
  */
 typedef struct font_provider_meta_data {
-    char **families;            // list of family names, e.g. "Arial"
-    char **fullnames;           // list of localized full names, e.g. "Arial Bold"
-    int n_family;               // list of family names
-    int n_fullname;             // number of localized full names
-    int slant;                  // uses the above scale (NONE/ITALIC/OBLIQUE)
-    int weight;                 // TrueType scale, 100-900
-    int width;                  // in percent, normally 100
+    char **families;    // list of family names, e.g. "Arial"
+    char **fullnames;   // list of localized full names, e.g. "Arial Bold"
+    int n_family;       // list of family names
+    int n_fullname;     // number of localized full names
+    int slant;          // uses the above scale (NONE/ITALIC/OBLIQUE)
+    int weight;         // TrueType scale, 100-900
+    int width;          // in percent, normally 100
 } ASS_FontProviderMetaData;
 
 
@@ -184,9 +185,9 @@ typedef struct ass_event {
  * in order to handle this as intended by xy-vsfilter.
  */
 typedef enum ASS_YCbCrMatrix {
-    YCBCR_DEFAULT = 0,          // Header missing
-    YCBCR_UNKNOWN,              // Header could not be parsed correctly
-    YCBCR_NONE,                 // "None" special value
+    YCBCR_DEFAULT = 0,  // Header missing
+    YCBCR_UNKNOWN,      // Header could not be parsed correctly
+    YCBCR_NONE,         // "None" special value
     YCBCR_BT601_TV,
     YCBCR_BT601_PC,
     YCBCR_BT709_TV,
@@ -203,15 +204,15 @@ typedef enum ASS_YCbCrMatrix {
  * headers are parsed (i.e. events format line read).
  */
 typedef struct ass_track {
-    int n_styles;               // amount used
-    int max_styles;             // amount allocated
+    int n_styles;           // amount used
+    int max_styles;         // amount allocated
     int n_events;
     int max_events;
-    ASS_Style *styles;          // array of styles, max_styles length, n_styles used
-    ASS_Event *events;          // the same as styles
+    ASS_Style *styles;    // array of styles, max_styles length, n_styles used
+    ASS_Event *events;    // the same as styles
 
-    char *style_format;         // style format line (everything after "Format: ")
-    char *event_format;         // event format line
+    char *style_format;     // style format line (everything after "Format: ")
+    char *event_format;     // event format line
 
     enum {
         TRACK_TYPE_UNKNOWN = 0,
@@ -229,11 +230,11 @@ typedef struct ass_track {
     char *Language;
     ASS_YCbCrMatrix YCbCrMatrix;
 
-    int default_style;          // index of default style
-    char *name;                 // file name in case of external subs, 0 for streams
+    int default_style;      // index of default style
+    char *name;             // file name in case of external subs, 0 for streams
 
     ASS_Library *library;
     ASS_ParserPriv *parser_priv;
 } ASS_Track;
 
-#endif                          /* LIBASS_TYPES_H */
+#endif /* LIBASS_TYPES_H */
